@@ -1,30 +1,10 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 
-/**
- * 1. Menghasilkan path untuk setiap postingan blog secara dinamis.
- */
-export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map(post => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
-}
-
-const { post } = Astro.props;
-const { Content } = await render(post);
-
-// Pastikan pubDate adalah objek Date yang valid
-const publishDate = post.data.pubDate ? new Date(post.data.pubDate) : new Date();
-
-// Fungsi sederhana untuk menghitung estimasi waktu baca
-const readingTime = (text: string) => {
-  const wordsPerMinute = 200;
-  const noOfWords = text.split(/\s/g).length;
-  const minutes = noOfWords / wordsPerMinute;
-  return Math.ceil(minutes);
-};
+// Mengambil semua postingan dan mengurutkan berdasarkan tanggal terbaru
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 ---
 
 <!DOCTYPE html>
@@ -32,116 +12,52 @@ const readingTime = (text: string) => {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Dasar -->
-    <title>{post.data.title} | Djafar Blog</title>
-    <meta name="description" content={post.data.description} />
-    
-    <!-- Open Graph / Facebook / WhatsApp -->
-    <meta property="og:type" content="article" />
-    <meta property="og:title" content={post.data.title} />
-    <meta property="og:description" content={post.data.description} />
-    {post.data.heroImage && <meta property="og:image" content={new URL(post.data.heroImage, Astro.url)} />}
-
+    <title>Blog | Djafar Blog</title>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --bg-body: #ffffff;
-        }
-
         body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            line-height: 1.75; 
-            max-width: 760px; 
+            font-family: 'Inter', sans-serif; 
+            max-width: 800px; 
             margin: 0 auto; 
-            padding: 40px 20px; 
-            color: var(--text-main);
-            background-color: var(--bg-body);
-        }
-
-        .nav-header { margin-bottom: 48px; }
-        .back-link { 
-            color: var(--primary); 
-            text-decoration: none; 
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .hero-img { 
-            width: 100%; 
-            height: auto;
-            aspect-ratio: 16 / 9;
-            object-fit: cover;
-            border-radius: 20px; 
-            margin-bottom: 40px; 
-        }
-
-        header h1 { 
-            font-size: 3rem; 
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 16px; 
+            padding: 3rem 1rem; 
+            background: #f9fafb;
             color: #111827;
         }
-
-        .post-meta { 
-            display: flex;
-            gap: 16px;
-            color: var(--text-muted);
-            margin-bottom: 48px;
+        h1 { font-size: 3rem; font-weight: 800; margin-bottom: 3rem; }
+        .post-list { list-style: none; padding: 0; }
+        .post-item { 
+            background: white;
+            margin-bottom: 1.5rem;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
         }
-
-        article { font-size: 1.25rem; }
-        article h2 { margin-top: 2.5rem; color: #111827; }
-        article p { margin-bottom: 1.5rem; }
-        article img { max-width: 100%; border-radius: 12px; margin: 2rem 0; }
-
-        footer {
-            margin-top: 80px;
-            padding-top: 40px;
-            border-top: 1px solid #f3f4f6;
-            text-align: center;
-            color: var(--text-muted);
-        }
+        .post-item:hover { transform: translateY(-4px); }
+        .post-link { text-decoration: none; color: inherit; }
+        .post-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0; color: #4f46e5; }
+        .post-desc { color: #4b5563; margin-bottom: 1rem; }
+        .post-date { font-size: 0.875rem; color: #9ca3af; }
     </style>
 </head>
 <body>
-    <nav class="nav-header">
-        <a href="/" class="back-link">← Kembali ke Beranda</a>
-    </nav>
-    
+    <nav><a href="/" style="text-decoration: none; color: #6366f1;">← Beranda</a></nav>
     <main>
-        <header>
-            {post.data.heroImage && (
-                <img src={post.data.heroImage} alt={post.data.title} class="hero-img" />
-            )}
-            
-            <h1>{post.data.title}</h1>
-            
-            <div class="post-meta">
-                <time datetime={publishDate.toISOString()}>
-                    📅 {publishDate.toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    })}
-                </time>
-                <span>•</span>
-                <span>⏱️ {readingTime(post.body)} menit baca</span>
-            </div>
-        </header>
-        
-        <article>
-            <Content />
-        </article>
+        <h1>Tulisan Terbaru</h1>
+        <ul class="post-list">
+            {posts.map((post) => (
+                <li class="post-item">
+                    <a href={`/blog/${post.slug}/`} class="post-link">
+                        <h2 class="post-title">{post.data.title}</h2>
+                        <p class="post-desc">{post.data.description}</p>
+                        <span class="post-date">
+                            {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
+                                day: 'numeric', month: 'long', year: 'numeric'
+                            })}
+                        </span>
+                    </a>
+                </li>
+            ))}
+        </ul>
     </main>
-    
-    <footer>
-        <p>&copy; {new Date().getFullYear()} Djafar Blog. Diterbitkan menggunakan Astro & TinaCMS.</p>
-    </footer>
 </body>
 </html>
