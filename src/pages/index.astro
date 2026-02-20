@@ -1,18 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
 
-// 1. Mengambil semua koleksi blog dari src/content/blog
 const allPosts = await getCollection('blog');
-
-// 2. Mengurutkan berdasarkan tanggal terbaru (descending)
 const posts = allPosts.sort((a, b) => {
   const dateA = a.data.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
   const dateB = b.data.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
   return dateB - dateA;
 });
 
-// Ambil 5 postingan terbaru untuk ditampilkan di beranda
 const recentPosts = posts.slice(0, 5);
+const featuredPost = posts[0];
 ---
 
 <!DOCTYPE html>
@@ -21,49 +18,118 @@ const recentPosts = posts.slice(0, 5);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Djafar | Security Researcher Portfolio</title>
+    <meta name="description" content="Security Researcher & Full-stack Developer. Membangun sistem yang aman dan mendokumentasikan setiap temuan." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         :root {
             --primary: #00f3ff;
-            --primary-glow: rgba(0, 243, 255, 0.2);
+            --primary-glow: rgba(0, 243, 255, 0.15);
+            --primary-dark: #00b8cc;
             --bg-dark: #05070a;
-            --surface: #0f172a;
-            --text-main: #e2e8f0;
+            --bg-surface: #0f172a;
+            --bg-surface-light: #1e293b;
+            --text-main: #f1f5f9;
             --text-muted: #94a3b8;
+            --text-secondary: #64748b;
             --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
         }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 50% -20%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
-                linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
+                radial-gradient(ellipse at 50% -20%, rgba(0, 243, 255, 0.08) 0%, transparent 50%),
+                linear-gradient(rgba(0, 243, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 60px 60px, 60px 60px;
             color: var(--text-main);
-            line-height: 1.6;
+            line-height: 1.7;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 4rem 1.5rem;
+            padding: 0 1.5rem;
         }
 
-        /* Bagian Hero */
-        .hero {
-            padding: 4rem 0;
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(5, 7, 10, 0.8);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0, 243, 255, 0.1);
-            margin-bottom: 5rem;
-            animation: fadeIn 1s ease-out;
+            padding: 1rem 0;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .nav-links a.active { color: var(--primary); }
+
+        /* Hero Section */
+        .hero {
+            padding: 12rem 0 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .status-badge {
@@ -71,189 +137,592 @@ const recentPosts = posts.slice(0, 5);
             align-items: center;
             gap: 0.5rem;
             font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--accent);
             background: rgba(16, 185, 129, 0.1);
             padding: 0.4rem 1rem;
             border-radius: 99px;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             border: 1px solid rgba(16, 185, 129, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: var(--accent);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent);
+            box-shadow: 0 0 8px var(--accent);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
         }
 
-        h1 {
-            font-size: 4rem;
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
             font-weight: 800;
             margin: 0 0 1.5rem 0;
-            letter-spacing: -0.04em;
-            line-height: 1;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
         }
 
-        h1 span { 
-            color: var(--primary); 
-            text-shadow: 0 0 15px var(--primary-glow);
+        .hero h1 span {
+            color: var(--primary);
+            text-shadow: 0 0 30px var(--primary-glow);
             font-family: 'Fira Code', monospace;
         }
 
         .hero p {
-            font-size: 1.25rem;
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
             color: var(--text-muted);
-            max-width: 600px;
+            max-width: 650px;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 0 30px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Featured Post */
+        .featured-section {
+            margin-bottom: 6rem;
+        }
+
+        .featured-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .featured-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 60px -20px var(--primary-glow);
+            transform: translateY(-5px);
+        }
+
+        .featured-image {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--bg-surface-light) 0%, var(--bg-surface) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fira Code', monospace;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .featured-image::before {
+            content: '🔒 SECURITY RESEARCH';
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .featured-content {
+            padding: 2.5rem;
+        }
+
+        .featured-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--primary);
+            background: rgba(0, 243, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 99px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .featured-content h2 {
+            font-size: 2rem;
+            margin: 0 0 1rem 0;
+            line-height: 1.3;
+        }
+
+        .featured-content p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .featured-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .featured-meta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: gap 0.3s;
+        }
+
+        .read-more:hover { gap: 0.6rem; }
+
+        /* Section Title */
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             margin-bottom: 2.5rem;
         }
 
-        /* Bagian Daftar Blog */
         .section-title {
             font-family: 'Fira Code', monospace;
             font-size: 1rem;
             color: var(--primary);
             text-transform: uppercase;
-            margin-bottom: 2.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            letter-spacing: 0.05em;
         }
 
         .section-title::after {
-            content: "";
+            content: '';
             flex: 1;
             height: 1px;
             background: linear-gradient(90deg, rgba(0, 243, 255, 0.3), transparent);
         }
 
-        .post-list { display: grid; gap: 1.5rem; }
+        /* Post Grid */
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
 
         .post-card {
-            background: var(--surface);
+            background: var(--bg-surface);
             border: 1px solid rgba(148, 163, 184, 0.1);
             border-radius: 16px;
-            padding: 2rem;
+            padding: 1.75rem;
             text-decoration: none;
             color: inherit;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-            backdrop-filter: blur(5px);
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .post-card:hover {
             border-color: var(--primary);
-            transform: translateX(10px);
+            transform: translateY(-4px);
             background: rgba(15, 23, 42, 0.8);
-            box-shadow: -10px 0 30px -10px var(--primary-glow);
+            box-shadow: 0 10px 40px -10px var(--primary-glow);
         }
 
-        .post-info h2 {
-            font-size: 1.5rem;
-            margin: 0 0 0.5rem 0;
+        .post-card:hover::before { opacity: 1; }
+
+        .post-category {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .post-card h3 {
+            font-size: 1.25rem;
+            margin: 0 0 0.75rem 0;
             color: var(--text-main);
+            line-height: 1.4;
             transition: color 0.3s;
         }
 
-        .post-card:hover .post-info h2 { color: var(--primary); }
+        .post-card:hover h3 { color: var(--primary); }
 
-        .post-info p {
-            margin: 0;
+        .post-card p {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex: 1;
             display: -webkit-box;
-            -webkit-line-clamp: 1;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            line-height: 1.6;
         }
 
         .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: var(--primary);
-            white-space: nowrap;
-            opacity: 0.6;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .post-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            border: 2px dashed rgba(148, 163, 184, 0.2);
+            border-radius: 24px;
+            background: var(--bg-surface);
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
         }
 
         /* Footer */
         footer {
             margin-top: 8rem;
-            padding-top: 4rem;
+            padding: 4rem 0 2rem;
             border-top: 1px solid rgba(148, 163, 184, 0.1);
             text-align: center;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            color: var(--text-muted);
         }
 
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .footer-logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .footer-logo span { color: var(--primary); }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover { color: var(--primary); }
+
+        .footer-copyright {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-surface-light);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 50%;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            h1 { font-size: 2.8rem; }
-            .post-card { flex-direction: column; align-items: flex-start; gap: 1rem; }
-            .post-meta { order: -1; }
+            .nav-links { display: none; }
+            
+            .hero { padding: 10rem 0 4rem; }
+            
+            .hero h1 { font-size: 2.5rem; }
+            
+            .featured-content h2 { font-size: 1.5rem; }
+            
+            .post-grid { grid-template-columns: 1fr; }
+            
+            .featured-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .footer-links { flex-direction: column; gap: 1rem; }
         }
     </style>
 </head>
 <body>
+    <nav>
+        <div class="container nav-content">
+            <a href="/" class="logo">
+                <span>&lt;</span> DJAFAR <span>/&gt;</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="https://github.com/fajaradnan13" target="_blank">GitHub</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
-        <!-- Hero Header -->
+        <!-- Hero Section -->
         <section class="hero">
             <div class="status-badge">
                 <div class="status-dot"></div>
-                SYSTEM_LIVE: PORTFOLIO_V2
+                System Live: Portfolio v2.0
             </div>
             <h1>Halo, Saya <span>Djafar.</span></h1>
             <p>
-                Security Researcher & Full-stack Developer. Membangun sistem yang aman 
-                dan mendokumentasikan setiap temuan dalam jurnal digital saya.
+                Security Researcher & Full-stack Developer. Membangun sistem yang aman, 
+                mengamankan infrastruktur, dan mendokumentasikan setiap temuan dalam jurnal digital saya.
             </p>
-            <div style="display: flex; gap: 1.5rem;">
-                <a href="https://github.com/fajaradnan13" target="_blank" style="color: var(--primary); text-decoration: none; font-family: 'Fira Code', monospace; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.5rem 1rem; border-radius: 8px;">[ GITHUB_REPOS ]</a>
-                <a href="/admin" style="color: var(--text-muted); text-decoration: none; font-family: 'Fira Code', monospace; font-size: 0.9rem; padding: 0.5rem 1rem;">[ ADMIN_ACCESS ]</a>
+            <div class="hero-actions">
+                <a href="/blog" class="btn btn-primary">
+                    Baca Jurnal <span>→</span>
+                </a>
+                <a href="https://github.com/fajaradnan13" target="_blank" class="btn btn-secondary">
+                    GitHub <span>↗</span>
+                </a>
             </div>
         </section>
 
-        <!-- Post List -->
-        <section>
-            <div class="section-title">RECENT_TRANSMISSIONS</div>
-            <div class="post-list">
-                {recentPosts.map((post) => (
-                    <a href={`/blog/${post.slug || post.id}/`} class="post-card">
-                        <div class="post-info">
-                            <h2>{post.data.title}</h2>
-                            <p>{post.data.description || "No transmission log provided..."}</p>
+        <!-- Featured Post -->
+        {featuredPost && (
+            <section class="featured-section">
+                <div class="section-header">
+                    <span class="section-title">Featured Transmission</span>
+                </div>
+                <a href={`/blog/${featuredPost.slug}/`} class="featured-card">
+                    <div class="featured-image"></div>
+                    <div class="featured-content">
+                        <span class="featured-tag">🔒 Featured</span>
+                        <h2>{featuredPost.data.title}</h2>
+                        <p>{featuredPost.data.description || "No description provided..."}</p>
+                        <div class="featured-footer">
+                            <div class="featured-meta">
+                                <span>{new Date(featuredPost.data.pubDate).toLocaleDateString('id-ID', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}</span>
+                                <span>•</span>
+                                <span>{featuredPost.data.readTime || '5 min read'}</span>
+                            </div>
+                            <a href={`/blog/${featuredPost.slug}/`} class="read-more">
+                                Baca Selengkapnya <span>→</span>
+                            </a>
                         </div>
+                    </div>
+                </a>
+            </section>
+        )}
+
+        <!-- Recent Posts -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-title">Recent Transmissions</span>
+            </div>
+            <div class="post-grid">
+                {recentPosts.map((post) => (
+                    <a href={`/blog/${post.slug}/`} class="post-card">
+                        <span class="post-category">Blog</span>
+                        <h3>{post.data.title}</h3>
+                        <p>{post.data.description || "No description provided..."}</p>
                         <div class="post-meta">
-                            {post.data.pubDate ? new Date(post.data.pubDate).toLocaleDateString('id-ID', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            }).toUpperCase() : "UNK_DATE"}
+                            <span class="post-meta-item">
+                                <span>📅</span>
+                                {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                })}
+                            </span>
+                            <span class="post-meta-item">
+                                <span>⏱️</span>
+                                {post.data.readTime || '5 min'}
+                            </span>
                         </div>
                     </a>
                 ))}
             </div>
             
             {recentPosts.length === 0 && (
-                <div style="text-align: center; padding: 4rem; border: 1px dashed rgba(148, 163, 184, 0.2); border-radius: 16px;">
-                    <p style="color: var(--text-muted); font-family: 'Fira Code', monospace;">[ ERROR: NO_CONTENT_FOUND_IN_COLLECTION ]</p>
+                <div class="empty-state">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
+                    <p>[ ERROR: NO_CONTENT_FOUND_IN_COLLECTION ]</p>
                 </div>
             )}
         </section>
 
+        <!-- Footer -->
         <footer>
-            TERMINAL_SESSION_END // {new Date().getFullYear()} — DJAFAR_PORTFOLIO
+            <div class="footer-content">
+                <a href="/" class="footer-logo">
+                    <span>&lt;</span> DJAFAR <span>/&gt;</span>
+                </a>
+                <div class="social-links">
+                    <a href="https://github.com/fajaradnan13" target="_blank" class="social-link" title="GitHub">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="https://twitter.com" target="_blank" class="social-link" title="Twitter">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        </svg>
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" class="social-link" title="LinkedIn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/about">About</a>
+                    <a href="/contact">Contact</a>
+                </div>
+                <div class="footer-copyright">
+                    TERMINAL_SESSION_END // {new Date().getFullYear()} — DJAFAR_PORTFOLIO
+                </div>
+            </div>
         </footer>
     </div>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(5, 7, 10, 0.95)';
+            } else {
+                nav.style.background = 'rgba(5, 7, 10, 0.8)';
+            }
+        });
+    </script>
 </body>
 </html>
