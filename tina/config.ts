@@ -1,15 +1,15 @@
 import { defineConfig } from "tinacms";
 
-// Menyesuaikan deteksi branch untuk Cloudflare Pages
+// Menentukan branch yang digunakan (untuk Cloudflare Pages atau lokal)
 const branch =
-  process.env.CF_PAGES_BRANCH || // Khusus Cloudflare Pages
+  process.env.CF_PAGES_BRANCH ||
   process.env.GITHUB_BRANCH ||
   "main";
 
 export default defineConfig({
   branch,
 
-  // Mengambil ID dan Token dari file .env
+  // Mengambil kredensial dari Environment Variables
   clientId: process.env.PUBLIC_TINA_CLIENT_ID,
   token: process.env.TINA_TOKEN,
 
@@ -19,7 +19,7 @@ export default defineConfig({
   },
   media: {
     tina: {
-      mediaRoot: "images", // Folder di dalam 'public' untuk simpan gambar
+      mediaRoot: "images",
       publicFolder: "public",
     },
   },
@@ -28,7 +28,7 @@ export default defineConfig({
       {
         name: "post",
         label: "Blog Posts",
-        // PENTING: Jalur ini sekarang mengarah ke standar Astro
+        // Mengarah ke folder konten standar Astro
         path: "src/content/blog",
         format: "md",
         fields: [
@@ -66,3 +66,5 @@ export default defineConfig({
     ],
   },
 });
+
+// Trigger re-index: Baris ini ditambahkan untuk memicu sinkronisasi ulang skema ke TinaCloud
