@@ -1,0 +1,139 @@
+---
+import { getCollection, render } from 'astro:content';
+
+/**
+ * 1. Menghasilkan path untuk setiap postingan blog secara dinamis.
+ * Astro akan mencari semua file di folder src/content/blog/
+ */
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+// 2. Mengambil data postingan dari props yang dikirim oleh getStaticPaths
+const { post } = Astro.props;
+// Menggunakan API render standar Astro 5.0
+const { Content } = await render(post);
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{post.data.title} | My Blog</title>
+    <style>
+        /* Desain modern untuk tampilan artikel blog */
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.8; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            color: #1f2937;
+            background-color: #ffffff;
+        }
+        .container {
+            margin-top: 40px;
+        }
+        .hero-img { 
+            width: 100%; 
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 16px; 
+            margin-bottom: 32px; 
+            background-color: #f3f4f6;
+        }
+        h1 { 
+            font-size: 3rem; 
+            font-weight: 800;
+            margin-bottom: 12px; 
+            line-height: 1.1;
+            color: #111827;
+            letter-spacing: -0.025em;
+        }
+        .meta { 
+            color: #6b7280; 
+            margin-bottom: 40px; 
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        article { 
+            font-size: 1.2rem; 
+            color: #374151;
+        }
+        article h2 { 
+            margin-top: 2.5rem; 
+            font-size: 1.75rem;
+            color: #111827; 
+        }
+        article p { margin-bottom: 1.75rem; }
+        nav { margin-bottom: 32px; }
+        .back-link { 
+            color: #4f46e5; 
+            text-decoration: none; 
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #4338ca; }
+        hr { border: 0; border-top: 1px solid #f3f4f6; margin: 40px 0; }
+        
+        /* Penyesuaian gambar di dalam artikel */
+        article img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/" class="back-link">← Kembali ke Beranda</a>
+        </nav>
+        
+        <main>
+            {post.data.heroImage && (
+                <img src={post.data.heroImage} alt={post.data.title} class="hero-img" />
+            )}
+            
+            <h1>{post.data.title}</h1>
+            
+            <div class="meta">
+                <time datetime={post.data.pubDate.toISOString()}>
+                    📅 {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })}
+                </time>
+                {post.data.description && (
+                    <>
+                        <span>•</span>
+                        <span>{post.data.description}</span>
+                    </>
+                )}
+            </div>
+            
+            <article>
+                <Content />
+            </article>
+        </main>
+        
+        <footer>
+            <hr />
+            <p style="text-align: center; color: #9ca3af; font-size: 0.875rem;">
+                &copy; {new Date().getFullYear()} Djafar Blog. Dibangun dengan Astro & TinaCMS.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
