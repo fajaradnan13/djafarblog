@@ -3,7 +3,6 @@ import { getCollection, render } from 'astro:content';
 
 /**
  * 1. Menghasilkan path untuk setiap postingan blog secara dinamis.
- * Astro akan mencari semua file di folder src/content/blog/
  */
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -13,10 +12,19 @@ export async function getStaticPaths() {
   }));
 }
 
-// 2. Mengambil data postingan dari props yang dikirim oleh getStaticPaths
 const { post } = Astro.props;
-// Menggunakan API render standar Astro 5.0
 const { Content } = await render(post);
+
+// Pastikan pubDate adalah objek Date yang valid
+const publishDate = post.data.pubDate ? new Date(post.data.pubDate) : new Date();
+
+// Fungsi sederhana untuk menghitung estimasi waktu baca
+const readingTime = (text: string) => {
+  const wordsPerMinute = 200;
+  const noOfWords = text.split(/\s/g).length;
+  const minutes = noOfWords / wordsPerMinute;
+  return Math.ceil(minutes);
+};
 ---
 
 <!DOCTYPE html>
@@ -24,116 +32,116 @@ const { Content } = await render(post);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{post.data.title} | My Blog</title>
+    
+    <!-- SEO Dasar -->
+    <title>{post.data.title} | Djafar Blog</title>
+    <meta name="description" content={post.data.description} />
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={post.data.title} />
+    <meta property="og:description" content={post.data.description} />
+    {post.data.heroImage && <meta property="og:image" content={new URL(post.data.heroImage, Astro.url)} />}
+
     <style>
-        /* Desain modern untuk tampilan artikel blog */
+        :root {
+            --primary: #4f46e5;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-body: #ffffff;
+        }
+
         body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            line-height: 1.8; 
-            max-width: 800px; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            line-height: 1.75; 
+            max-width: 760px; 
             margin: 0 auto; 
-            padding: 20px; 
-            color: #1f2937;
-            background-color: #ffffff;
+            padding: 40px 20px; 
+            color: var(--text-main);
+            background-color: var(--bg-body);
         }
-        .container {
-            margin-top: 40px;
+
+        .nav-header { margin-bottom: 48px; }
+        .back-link { 
+            color: var(--primary); 
+            text-decoration: none; 
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
         .hero-img { 
             width: 100%; 
             height: auto;
             aspect-ratio: 16 / 9;
             object-fit: cover;
-            border-radius: 16px; 
-            margin-bottom: 32px; 
-            background-color: #f3f4f6;
+            border-radius: 20px; 
+            margin-bottom: 40px; 
         }
-        h1 { 
+
+        header h1 { 
             font-size: 3rem; 
             font-weight: 800;
-            margin-bottom: 12px; 
             line-height: 1.1;
+            margin-bottom: 16px; 
             color: #111827;
-            letter-spacing: -0.025em;
         }
-        .meta { 
-            color: #6b7280; 
-            margin-bottom: 40px; 
-            font-size: 1rem;
+
+        .post-meta { 
             display: flex;
-            align-items: center;
-            gap: 12px;
+            gap: 16px;
+            color: var(--text-muted);
+            margin-bottom: 48px;
         }
-        article { 
-            font-size: 1.2rem; 
-            color: #374151;
-        }
-        article h2 { 
-            margin-top: 2.5rem; 
-            font-size: 1.75rem;
-            color: #111827; 
-        }
-        article p { margin-bottom: 1.75rem; }
-        nav { margin-bottom: 32px; }
-        .back-link { 
-            color: #4f46e5; 
-            text-decoration: none; 
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            transition: color 0.2s;
-        }
-        .back-link:hover { color: #4338ca; }
-        hr { border: 0; border-top: 1px solid #f3f4f6; margin: 40px 0; }
-        
-        /* Penyesuaian gambar di dalam artikel */
-        article img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
+
+        article { font-size: 1.25rem; }
+        article h2 { margin-top: 2.5rem; color: #111827; }
+        article p { margin-bottom: 1.5rem; }
+        article img { max-width: 100%; border-radius: 12px; margin: 2rem 0; }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #f3f4f6;
+            text-align: center;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <nav>
-            <a href="/" class="back-link">← Kembali ke Beranda</a>
-        </nav>
-        
-        <main>
+    <nav class="nav-header">
+        <a href="/" class="back-link">← Kembali ke Beranda</a>
+    </nav>
+    
+    <main>
+        <header>
             {post.data.heroImage && (
                 <img src={post.data.heroImage} alt={post.data.title} class="hero-img" />
             )}
             
             <h1>{post.data.title}</h1>
             
-            <div class="meta">
-                <time datetime={post.data.pubDate.toISOString()}>
-                    📅 {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
-                        year: 'numeric',
+            <div class="post-meta">
+                <time datetime={publishDate.toISOString()}>
+                    📅 {publishDate.toLocaleDateString('id-ID', {
+                        day: 'numeric',
                         month: 'long',
-                        day: 'numeric'
+                        year: 'numeric'
                     })}
                 </time>
-                {post.data.description && (
-                    <>
-                        <span>•</span>
-                        <span>{post.data.description}</span>
-                    </>
-                )}
+                <span>•</span>
+                <span>⏱️ {readingTime(post.body)} menit baca</span>
             </div>
-            
-            <article>
-                <Content />
-            </article>
-        </main>
+        </header>
         
-        <footer>
-            <hr />
-            <p style="text-align: center; color: #9ca3af; font-size: 0.875rem;">
-                &copy; {new Date().getFullYear()} Djafar Blog. Dibangun dengan Astro & TinaCMS.
-            </p>
-        </footer>
-    </div>
+        <article>
+            <Content />
+        </article>
+    </main>
+    
+    <footer>
+        <p>&copy; {new Date().getFullYear()} Djafar Blog. Diterbitkan menggunakan Astro & TinaCMS.</p>
+    </footer>
 </body>
 </html>
