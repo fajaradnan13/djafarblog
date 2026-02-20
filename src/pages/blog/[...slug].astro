@@ -1,10 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
 
-// Mengambil semua postingan dan mengurutkan berdasarkan tanggal terbaru
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+// Mengambil semua postingan dari folder src/content/blog
+const allPosts = await getCollection('blog');
+
+// Mengurutkan postingan berdasarkan tanggal terbaru dengan penanganan error jika pubDate kosong
+const posts = allPosts.sort((a, b) => {
+    const dateA = a.data.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
+    const dateB = b.data.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
+    return dateB - dateA;
+});
 ---
 
 <!DOCTYPE html>
@@ -14,50 +19,72 @@ const posts = (await getCollection('blog')).sort(
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blog | Djafar Blog</title>
     <style>
+        :root {
+            --primary: #4f46e5;
+            --bg-page: #f9fafb;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+        }
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Inter', -apple-system, sans-serif; 
             max-width: 800px; 
             margin: 0 auto; 
             padding: 3rem 1rem; 
-            background: #f9fafb;
-            color: #111827;
+            background: var(--bg-page);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
-        h1 { font-size: 3rem; font-weight: 800; margin-bottom: 3rem; }
-        .post-list { list-style: none; padding: 0; }
+        nav { margin-bottom: 2rem; }
+        .back-home { text-decoration: none; color: var(--primary); font-weight: 500; }
+        h1 { font-size: 3rem; font-weight: 800; margin-bottom: 3rem; letter-spacing: -0.02em; }
+        
+        .post-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1.5rem; }
         .post-item { 
             background: white;
-            margin-bottom: 1.5rem;
             padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #f3f4f6;
         }
-        .post-item:hover { transform: translateY(-4px); }
-        .post-link { text-decoration: none; color: inherit; }
-        .post-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0; color: #4f46e5; }
-        .post-desc { color: #4b5563; margin-bottom: 1rem; }
-        .post-date { font-size: 0.875rem; color: #9ca3af; }
+        .post-item:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+        .post-link { text-decoration: none; color: inherit; display: block; }
+        .post-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.75rem 0; color: var(--text-dark); }
+        .post-desc { color: var(--text-light); margin-bottom: 1.5rem; font-size: 1rem; }
+        .post-date { 
+            font-size: 0.875rem; 
+            color: var(--text-light); 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
-    <nav><a href="/" style="text-decoration: none; color: #6366f1;">← Beranda</a></nav>
+    <nav><a href="/" class="back-home">← Kembali ke Beranda</a></nav>
     <main>
         <h1>Tulisan Terbaru</h1>
         <ul class="post-list">
             {posts.map((post) => (
                 <li class="post-item">
-                    <a href={`/blog/${post.slug}/`} class="post-link">
+                    {/* Menggunakan slug atau id sebagai fallback rute */}
+                    <a href={`/blog/${post.slug || post.id}/`} class="post-link">
                         <h2 class="post-title">{post.data.title}</h2>
-                        <p class="post-desc">{post.data.description}</p>
+                        <p class="post-desc">{post.data.description || "Klik untuk membaca selengkapnya..."}</p>
                         <span class="post-date">
-                            {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
+                            📅 {post.data.pubDate ? new Date(post.data.pubDate).toLocaleDateString('id-ID', {
                                 day: 'numeric', month: 'long', year: 'numeric'
-                            })}
+                            }) : "Tanpa Tanggal"}
                         </span>
                     </a>
                 </li>
             ))}
         </ul>
+        {posts.length === 0 && <p style="text-align: center; color: #9ca3af;">Belum ada tulisan untuk saat ini.</p>}
     </main>
 </body>
 </html>
