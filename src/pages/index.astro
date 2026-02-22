@@ -1,15 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 
+const { slug } = Astro.props;
 const allPosts = await getCollection('blog');
-const posts = allPosts.sort((a, b) => {
-  const dateA = a.data.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
-  const dateB = b.data.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
-  return dateB - dateA;
-});
+const post = allPosts.find((p) => p.slug === slug);
 
-const recentPosts = posts.slice(0, 5);
-const featuredPost = posts[0];
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const prevPost = allPosts.find((p) => p.data.pubDate < post.data.pubDate);
+const nextPost = allPosts.find((p) => p.data.pubDate > post.data.pubDate);
 ---
 
 <!DOCTYPE html>
@@ -17,8 +18,8 @@ const featuredPost = posts[0];
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Djafar | Security Researcher Portfolio</title>
-    <meta name="description" content="Security Researcher & Full-stack Developer. Membangun sistem yang aman dan mendokumentasikan setiap temuan." />
+    <title>{post.data.title} | Djafar</title>
+    <meta name="description" content={post.data.description || "Security Researcher Portfolio"} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -58,7 +59,7 @@ const featuredPost = posts[0];
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 1.5rem;
         }
@@ -113,167 +114,42 @@ const featuredPost = posts[0];
 
         .nav-links a.active { color: var(--primary); }
 
-        /* Hero Section */
-        .hero {
-            padding: 12rem 0 6rem;
-            position: relative;
-            overflow: hidden;
+        /* Blog Post Container */
+        .blog-post {
+            padding: 10rem 0 6rem;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(0, 243, 255, 0.05) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .status-badge {
+        /* Back Button */
+        .back-button {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
-            color: var(--accent);
-            background: rgba(16, 185, 129, 0.1);
-            padding: 0.4rem 1rem;
-            border-radius: 99px;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.1); }
-        }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 5rem);
-            font-weight: 800;
-            margin: 0 0 1.5rem 0;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-        }
-
-        .hero h1 span {
-            color: var(--primary);
-            text-shadow: 0 0 30px var(--primary-glow);
-            font-family: 'Fira Code', monospace;
-        }
-
-        .hero p {
-            font-size: clamp(1.1rem, 2vw, 1.35rem);
-            color: var(--text-muted);
-            max-width: 650px;
-            margin-bottom: 2.5rem;
-            line-height: 1.8;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
             font-family: 'Fira Code', monospace;
             font-size: 0.85rem;
-            font-weight: 600;
+            color: var(--text-muted);
             text-decoration: none;
-            border-radius: 8px;
+            margin-bottom: 2rem;
             transition: all 0.3s;
             cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: var(--bg-dark);
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 0 30px var(--primary-glow);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid rgba(148, 163, 184, 0.3);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--primary);
+        .back-button:hover {
             color: var(--primary);
-        }
-
-        /* Featured Post */
-        .featured-section {
-            margin-bottom: 6rem;
-        }
-
-        .featured-card {
-            background: var(--bg-surface);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 24px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .featured-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 20px 60px -20px var(--primary-glow);
-            transform: translateY(-5px);
+            background: rgba(0, 243, 255, 0.05);
         }
 
-        .featured-image {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            background: linear-gradient(135deg, var(--bg-surface-light) 0%, var(--bg-surface) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Fira Code', monospace;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        /* Post Header */
+        .post-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
 
-        .featured-image::before {
-            content: '🔒 SECURITY RESEARCH';
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            opacity: 0.5;
-        }
-
-        .featured-content {
-            padding: 2.5rem;
-        }
-
-        .featured-tag {
+        .post-category {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
@@ -288,186 +164,208 @@ const featuredPost = posts[0];
             letter-spacing: 0.05em;
         }
 
-        .featured-content h2 {
-            font-size: 2rem;
-            margin: 0 0 1rem 0;
-            line-height: 1.3;
-        }
-
-        .featured-content p {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .featured-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .featured-meta {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .read-more {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            color: var(--primary);
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: gap 0.3s;
-        }
-
-        .read-more:hover { gap: 0.6rem; }
-
-        /* Section Title */
-        .section {
-            margin-bottom: 5rem;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .section-title {
-            font-family: 'Fira Code', monospace;
-            font-size: 1rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(0, 243, 255, 0.3), transparent);
-        }
-
-        /* Post Grid */
-        .post-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .post-card {
-            background: var(--bg-surface);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 1.75rem;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .post-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .post-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-4px);
-            background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 10px 40px -10px var(--primary-glow);
-        }
-
-        .post-card:hover::before { opacity: 1; }
-
-        .post-category {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.7rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-
-        .post-card h3 {
-            font-size: 1.25rem;
-            margin: 0 0 0.75rem 0;
+        .post-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin: 0 0 1.5rem 0;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
             color: var(--text-main);
-            line-height: 1.4;
-            transition: color 0.3s;
         }
 
-        .post-card:hover h3 { color: var(--primary); }
-
-        .post-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.6;
+        .post-title span {
+            color: var(--primary);
+            text-shadow: 0 0 30px var(--primary-glow);
         }
 
         .post-meta {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
             font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
         }
 
         .post-meta-item {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.4rem;
         }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 5rem 2rem;
-            border: 2px dashed rgba(148, 163, 184, 0.2);
-            border-radius: 24px;
-            background: var(--bg-surface);
+        /* Post Content */
+        .post-content {
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: var(--text-main);
         }
 
-        .empty-state p {
+        .post-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .post-content h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .post-content h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            color: var(--text-main);
+        }
+
+        .post-content ul, .post-content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .post-content li {
+            margin-bottom: 0.5rem;
             color: var(--text-muted);
+        }
+
+        .post-content code {
             font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            margin-top: 1rem;
+            font-size: 0.9em;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--primary);
+        }
+
+        .post-content pre {
+            background: var(--bg-surface-light);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .post-content pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: var(--text-main);
+        }
+
+        .post-content blockquote {
+            border-left: 3px solid var(--primary);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .post-content a {
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--primary);
+            transition: all 0.3s;
+        }
+
+        .post-content a:hover {
+            color: var(--primary-dark);
+            border-bottom-style: solid;
+        }
+
+        /* Tags */
+        .post-tags {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: rgba(0, 243, 255, 0.1);
+            padding: 0.4rem 0.9rem;
+            border-radius: 99px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .tag:hover {
+            background: rgba(0, 243, 255, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        /* Navigation Cards */
+        .post-navigation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 5rem;
+        }
+
+        .nav-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 1.75rem;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .nav-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px -10px var(--primary-glow);
+        }
+
+        .nav-card.prev { text-align: left; }
+        .nav-card.next { text-align: right; }
+
+        .nav-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .nav-card:hover h4 { color: var(--primary); }
+
+        .nav-card p {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         /* Footer */
         footer {
-            margin-top: 8rem;
+            margin-top: 6rem;
             padding: 4rem 0 2rem;
             border-top: 1px solid rgba(148, 163, 184, 0.1);
             text-align: center;
@@ -543,22 +441,10 @@ const featuredPost = posts[0];
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            
-            .hero { padding: 10rem 0 4rem; }
-            
-            .hero h1 { font-size: 2.5rem; }
-            
-            .featured-content h2 { font-size: 1.5rem; }
-            
-            .post-grid { grid-template-columns: 1fr; }
-            
-            .featured-footer {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .footer-links { flex-direction: column; gap: 1rem; }
+            .blog-post { padding: 8rem 0 4rem; }
+            .post-title { font-size: 2rem; }
+            .post-navigation { grid-template-columns: 1fr; }
+            .nav-card.prev, .nav-card.next { text-align: left; }
         }
     </style>
 </head>
@@ -578,96 +464,70 @@ const featuredPost = posts[0];
     </nav>
 
     <div class="container">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="status-badge">
-                <div class="status-dot"></div>
-                System Live: Portfolio v2.0
-            </div>
-            <h1>Halo, Saya <span>Djafar.</span></h1>
-            <p>
-                Security Researcher & Full-stack Developer. Membangun sistem yang aman, 
-                mengamankan infrastruktur, dan mendokumentasikan setiap temuan dalam jurnal digital saya.
-            </p>
-            <div class="hero-actions">
-                <a href="/blog" class="btn btn-primary">
-                    Baca Jurnal <span>→</span>
-                </a>
-                <a href="https://github.com/fajaradnan13" target="_blank" class="btn btn-secondary">
-                    GitHub <span>↗</span>
-                </a>
-            </div>
-        </section>
+        <div class="blog-post">
+            <a href="/blog" class="back-button">
+                ← Kembali ke Jurnal
+            </a>
 
-        <!-- Featured Post -->
-        {featuredPost && (
-            <section class="featured-section">
-                <div class="section-header">
-                    <span class="section-title">Featured Transmission</span>
-                </div>
-                <a href={`/blog/${featuredPost.slug}/`} class="featured-card">
-                    <div class="featured-image"></div>
-                    <div class="featured-content">
-                        <span class="featured-tag">🔒 Featured</span>
-                        <h2>{featuredPost.data.title}</h2>
-                        <p>{featuredPost.data.description || "No description provided..."}</p>
-                        <div class="featured-footer">
-                            <div class="featured-meta">
-                                <span>{new Date(featuredPost.data.pubDate).toLocaleDateString('id-ID', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}</span>
-                                <span>•</span>
-                                <span>{featuredPost.data.readTime || '5 min read'}</span>
-                            </div>
-                            <a href={`/blog/${featuredPost.slug}/`} class="read-more">
-                                Baca Selengkapnya <span>→</span>
-                            </a>
-                        </div>
+            <article>
+                <header class="post-header">
+                    <span class="post-category">🔒 {post.data.category || 'Blog'}</span>
+                    <h1 class="post-title">{post.data.title}</h1>
+                    <div class="post-meta">
+                        <span class="post-meta-item">
+                            <span>📅</span>
+                            {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}
+                        </span>
+                        <span class="post-meta-item">
+                            <span>⏱️</span>
+                            {post.data.readTime || '5 min read'}
+                        </span>
                     </div>
-                </a>
-            </section>
-        )}
+                </header>
 
-        <!-- Recent Posts -->
-        <section class="section">
-            <div class="section-header">
-                <span class="section-title">Recent Transmissions</span>
-            </div>
-            <div class="post-grid">
-                {recentPosts.map((post) => (
-                    <a href={`/blog/${post.slug}/`} class="post-card">
-                        <span class="post-category">Blog</span>
-                        <h3>{post.data.title}</h3>
-                        <p>{post.data.description || "No description provided..."}</p>
-                        <div class="post-meta">
-                            <span class="post-meta-item">
-                                <span>📅</span>
-                                {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                })}
-                            </span>
-                            <span class="post-meta-item">
-                                <span>⏱️</span>
-                                {post.data.readTime || '5 min'}
-                            </span>
-                        </div>
-                    </a>
-                ))}
-            </div>
-            
-            {recentPosts.length === 0 && (
-                <div class="empty-state">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
-                    <p>[ ERROR: NO_CONTENT_FOUND_IN_COLLECTION ]</p>
+                <div class="post-content">
+                    <Content />
                 </div>
-            )}
-        </section>
 
-        <!-- Footer -->
+                <div class="post-tags">
+                    <span class="tags-container">
+                        {(post.data.tags || []).map((tag) => (
+                            <a href={`/blog?tag=${tag}`} class="tag">
+                                #{tag}
+                            </a>
+                        ))}
+                    </span>
+                </div>
+            </article>
+
+            <div class="post-navigation">
+                {prevPost && (
+                    <a href={`/blog/${prevPost.slug}/`} class="nav-card prev">
+                        <span class="nav-label">← PREVIOUS TRANSMISSION</span>
+                        <h4>{prevPost.data.title}</h4>
+                        <p>{new Date(prevPost.data.pubDate).toLocaleDateString('id-ID', {
+                            month: 'short',
+                            day: 'numeric'
+                        })}</p>
+                    </a>
+                )}
+                {nextPost && (
+                    <a href={`/blog/${nextPost.slug}/`} class="nav-card next">
+                        <span class="nav-label">NEXT TRANSMISSION →</span>
+                        <h4>{nextPost.data.title}</h4>
+                        <p>{new Date(nextPost.data.pubDate).toLocaleDateString('id-ID', {
+                            month: 'short',
+                            day: 'numeric'
+                        })}</p>
+                    </a>
+                )}
+            </div>
+        </div>
+
         <footer>
             <div class="footer-content">
                 <a href="/" class="footer-logo">
