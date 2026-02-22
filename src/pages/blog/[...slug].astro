@@ -1,16 +1,25 @@
 ---
 import { getCollection } from 'astro:content';
 
-const { slug } = Astro.props;
-const allPosts = await getCollection('blog');
-const post = allPosts.find((p) => p.slug === slug);
-
-if (!post) {
-  return Astro.redirect('/404');
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  return allPosts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
 
-const prevPost = allPosts.find((p) => p.data.pubDate < post.data.pubDate);
-const nextPost = allPosts.find((p) => p.data.pubDate > post.data.pubDate);
+const { post } = Astro.props;
+const allPosts = await getCollection('blog');
+
+// Find prev/next post by date
+const sortedPosts = allPosts.sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
+const currentIndex = sortedPosts.findIndex((p) => p.slug === post.slug);
+
+const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+
+const { Content } = await post.render();
 ---
 
 <!DOCTYPE html>
