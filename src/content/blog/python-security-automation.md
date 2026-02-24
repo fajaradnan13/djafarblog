@@ -3,7 +3,7 @@ title: "Mengenal Python untuk Security Automation: Panduan Lengkap Pemula"
 description: "Pelajari cara menggunakan Python untuk otomatisasi tugas keamanan siber. Dari scanning port hingga vulnerability assessment dengan contoh kode lengkap."
 pubDate: 2025-02-24T10:00:00Z
 category: "security"
-tags: ["python", "security", "automation", "cybersecurity", "tutorial"]
+tags: ["python", "security", "automation", "cybersecurity", "tutorial", "beginner"]
 draft: false
 imageWidth: "large"
 ---

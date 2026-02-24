@@ -118,7 +118,8 @@ export default defineConfig({
             label: "Tags",
             list: true,
             ui: {
-              component: "tags",
+              component: "textarea",
+              description: "Enter tags separated by commas (e.g., python, security, tutorial)",
             },
           },
           {
