@@ -3,10 +3,11 @@ title: "Mengenal Python untuk Security Automation: Panduan Lengkap Pemula"
 description: "Pelajari cara menggunakan Python untuk otomatisasi tugas keamanan siber. Dari scanning port hingga vulnerability assessment dengan contoh kode lengkap."
 pubDate: 2025-02-24T10:00:00Z
 category: "security"
-tags: ["python", "security", "automation", "cybersecurity", "tutorial", "beginner"]
 draft: false
 imageWidth: "large"
 ---
+
+<!-- tags: python, security, automation, cybersecurity, tutorial, beginner -->
 
 Python adalah salah satu bahasa pemrograman paling populer di dunia cybersecurity. Dalam artikel ini, kita akan mempelajari bagaimana menggunakan Python untuk mengotomatisasi tugas-tugas keamanan siber.
 

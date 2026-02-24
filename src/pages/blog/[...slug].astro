@@ -34,6 +34,11 @@ const wordsPerMinute = 200;
 const wordCount = textContent.split(/\s+/).length;
 const readTime = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
 
+// Parse tags from body content (look for <!-- tags: tag1, tag2 -->)
+const tagsMatch = post.body.match(/<!--\s*tags:\s*([^\n]+)\s*-->/);
+const bodyTags = tagsMatch ? tagsMatch[1].split(',').map(t => t.trim()).filter(Boolean) : [];
+const postTags = post.data.tags && post.data.tags.length > 0 ? post.data.tags : bodyTags;
+
 // Get headings for TOC
 const headings = [];
 const headingRegex = /^(#{2,3})\s+(.+)$/gm;
@@ -158,9 +163,9 @@ while ((match = headingRegex.exec(post.body)) !== null) {
           </div>
           
           <!-- Tags -->
-          {post.data.tags && post.data.tags.length > 0 && (
-            <div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-terminal-border">
-              {post.data.tags.map((tag) => (
+          {postTags && postTags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-gray-200 dark:border-terminal-border">
+              {postTags.map((tag) => (
                 <a href={`/blog?tag=${tag}`} class="tag">
                   #{tag}
                 </a>
