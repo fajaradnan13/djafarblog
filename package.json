@@ -6,7 +6,8 @@
   "author": "Fajar Adnan",
   "scripts": {
     "dev": "astro dev",
-    "build": "tinacms build && astro build",
+    "build": "astro build",
+    "build:tina": "tinacms build && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint . --ext .astro,.js,.ts",
