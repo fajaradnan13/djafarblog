@@ -1,19 +1,36 @@
 {
-  "name": "starry-spiral",
+  "name": "djafarblog",
   "type": "module",
-  "version": "0.0.1",
+  "version": "2.0.0",
+  "description": "Modern tech blog built with Astro, TailwindCSS, and TinaCMS",
+  "author": "Fajar Adnan",
   "scripts": {
     "dev": "astro dev",
     "build": "tinacms build && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lint": "eslint . --ext .astro,.js,.ts",
+    "lint:fix": "eslint . --ext .astro,.js,.ts --fix"
   },
   "dependencies": {
     "astro": "^5.17.1",
     "tinacms": "^3.5.0"
   },
   "devDependencies": {
+    "@astrojs/sitemap": "^3.2.0",
+    "@astrojs/tailwind": "^5.1.4",
+    "@tailwindcss/typography": "^0.5.19",
     "@tinacms/cli": "^2.1.6",
-    "@types/node": "^25.3.0"
-  }
+    "@types/node": "^25.3.0",
+    "tailwindcss": "^3.4.17"
+  },
+  "keywords": [
+    "blog",
+    "astro",
+    "tailwindcss",
+    "security",
+    "technology",
+    "tinacms"
+  ],
+  "license": "MIT"
 }

@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /_astro/
+
+# Sitemap
+Sitemap: https://djafar.blog/sitemap.xml
+
+# Crawl-delay for polite bots
+Crawl-delay: 1
+
+# Block common vulnerabilities scanners
+User-agent: masscan
+User-agent: zgrab
+Disallow: /

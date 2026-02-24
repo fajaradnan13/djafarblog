@@ -1,0 +1,159 @@
+---
+interface Props {
+  posts: {
+    slug: string;
+    data: {
+      title: string;
+      description: string;
+      pubDate: string | Date;
+      category?: string;
+      tags?: string[];
+    };
+  }[];
+}
+
+const { posts = [] } = Astro.props;
+---
+
+<div 
+  id="search-modal" 
+  class="fixed inset-0 z-[60] hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-title"
+>
+  <!-- Backdrop -->
+  <div 
+    class="absolute inset-0 bg-dark-900/80 backdrop-blur-sm"
+    id="search-backdrop"
+  ></div>
+  
+  <!-- Modal -->
+  <div class="relative max-w-2xl mx-auto mt-20 bg-dark-800 border border-terminal-border rounded-xl shadow-2xl overflow-hidden">
+    <!-- Search Input -->
+    <div class="flex items-center gap-3 px-4 py-3 border-b border-terminal-border">
+      <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search articles..."
+        class="flex-1 bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none"
+        autocomplete="off"
+      />
+      <kbd class="hidden sm:inline-flex px-2 py-1 text-xs bg-dark-700 text-gray-500 rounded">ESC</kbd>
+    </div>
+    
+    <!-- Search Results -->
+    <div id="search-results" class="max-h-96 overflow-y-auto p-2">
+      {posts.map((post) => (
+        <a
+          href={`/blog/${post.slug}/`}
+          class="search-result-item block px-3 py-3 rounded-lg hover:bg-dark-700 transition-colors"
+          data-title={post.data.title.toLowerCase()}
+          data-description={post.data.description.toLowerCase()}
+          data-tags={(post.data.tags || []).join(' ').toLowerCase()}
+        >
+          <h4 class="text-gray-100 font-medium mb-1">{post.data.title}</h4>
+          <p class="text-gray-400 text-sm line-clamp-2">{post.data.description}</p>
+          <div class="flex items-center gap-2 mt-2">
+            {post.data.category && (
+              <span class="tag">{post.data.category}</span>
+            )}
+            <span class="text-xs text-gray-500 font-mono">
+              {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+    
+    <!-- Empty State -->
+    <div id="search-empty" class="hidden p-8 text-center">
+      <svg class="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <p class="text-gray-400">No articles found</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search-result-item[hidden] {
+    display: none;
+  }
+  
+  .search-result-item mark {
+    @apply bg-primary-500/30 text-primary-300 rounded px-0.5;
+  }
+</style>
+
+<script>
+  const searchModal = document.getElementById('search-modal');
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchResults = document.getElementById('search-results');
+  const searchEmpty = document.getElementById('search-empty');
+  const searchBackdrop = document.getElementById('search-backdrop');
+  
+  // Open search modal
+  function openSearch() {
+    searchModal?.classList.remove('hidden');
+    searchInput?.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  
+  // Close search modal
+  function closeSearch() {
+    searchModal?.classList.add('hidden');
+    searchInput.value = '';
+    document.body.style.overflow = '';
+    filterResults('');
+  }
+  
+  // Filter search results
+  function filterResults(query: string) {
+    const items = searchResults?.querySelectorAll('.search-result-item');
+    let visibleCount = 0;
+    
+    items?.forEach((item) => {
+      const title = item.getAttribute('data-title') || '';
+      const description = item.getAttribute('data-description') || '';
+      const tags = item.getAttribute('data-tags') || '';
+      
+      const matches = title.includes(query) || description.includes(query) || tags.includes(query);
+      
+      if (matches) {
+        item.removeAttribute('hidden');
+        visibleCount++;
+      } else {
+        item.setAttribute('hidden', '');
+      }
+    });
+    
+    searchEmpty?.classList.toggle('hidden', visibleCount > 0 || query === '');
+  }
+  
+  // Event listeners
+  searchBackdrop?.addEventListener('click', closeSearch);
+  
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
+    filterResults(query);
+  });
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchModal && !searchModal.classList.contains('hidden')) {
+      closeSearch();
+    }
+  });
+  
+  // Global search trigger
+  (window as any).openSearch = openSearch;
+  
+  document.getElementById('search-btn')?.addEventListener('click', openSearch);
+</script>

@@ -1,0 +1,76 @@
+---
+interface Props {
+  headings: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+}
+
+const { headings = [] } = Astro.props;
+
+// Filter only h2 and h3 headings
+const tocHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
+---
+
+{tocHeadings.length > 0 && (
+  <aside class="toc-container hidden xl:block">
+    <nav aria-label="Table of Contents">
+      <h3 class="text-sm font-semibold text-gray-100 uppercase tracking-wider mb-4">
+        On This Page
+      </h3>
+      <ul class="space-y-1">
+        {tocHeadings.map((heading) => (
+          <li>
+            <a 
+              href={`#${heading.slug}`}
+              class="toc-link"
+              style:padding-left={heading.depth === 3 ? '1.5rem' : '0'}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </aside>
+)}
+
+<script>
+  // Highlight active TOC item on scroll
+  const observerOptions = {
+    root: null,
+    rootMargin: '-100px 0px -60% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.toc-link').forEach((link) => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${entry.target.id}`) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('h2, h3').forEach((heading) => {
+    observer.observe(heading);
+  });
+
+  // Smooth scroll for TOC links
+  document.querySelectorAll('.toc-link').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href')?.slice(1);
+      const target = document.getElementById(targetId || '');
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Update URL without jumping
+      history.pushState(null, '', `#${targetId}`);
+    });
+  });
+</script>

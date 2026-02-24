@@ -1,6 +1,5 @@
 import { defineConfig } from "tinacms";
 
-// Menentukan branch yang digunakan (untuk Cloudflare Pages atau lokal)
 const branch =
   process.env.CF_PAGES_BRANCH ||
   process.env.GITHUB_BRANCH ||
@@ -9,7 +8,6 @@ const branch =
 export default defineConfig({
   branch,
 
-  // Mengambil kredensial dari Environment Variables
   clientId: process.env.PUBLIC_TINA_CLIENT_ID,
   token: process.env.TINA_TOKEN,
 
@@ -28,8 +26,136 @@ export default defineConfig({
       {
         name: "post",
         label: "Blog Posts",
-        // Mengarah ke folder konten standar Astro
         path: "src/content/blog",
+        format: "md",
+        ui: {
+          router: ({ document }) => {
+            return `/blog/${document._sys.filename}`;
+          },
+        },
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            label: "Title",
+            isTitle: true,
+            required: true,
+            validate: (value) => {
+              if (!value || value.length < 3) {
+                return "Title must be at least 3 characters";
+              }
+              if (value.length > 100) {
+                return "Title must be less than 100 characters";
+              }
+            },
+          },
+          {
+            type: "string",
+            name: "description",
+            label: "Description (Meta)",
+            required: true,
+            ui: {
+              component: "textarea",
+            },
+            validate: (value) => {
+              if (!value) return "Description is required";
+              if (value.length < 50) return "Description must be at least 50 characters";
+              if (value.length > 160) return "Description should be less than 160 characters for SEO";
+            },
+          },
+          {
+            type: "datetime",
+            name: "pubDate",
+            label: "Date Published",
+            required: true,
+          },
+          {
+            type: "datetime",
+            name: "updatedDate",
+            label: "Date Updated",
+          },
+          {
+            type: "image",
+            name: "heroImage",
+            label: "Hero Image",
+            description: "Featured image for social sharing (1200x630 recommended)",
+          },
+          {
+            type: "string",
+            name: "category",
+            label: "Category",
+            options: [
+              { label: "Technology", value: "technology" },
+              { label: "Security", value: "security" },
+              { label: "Tutorial", value: "tutorial" },
+              { label: "DevOps", value: "devops" },
+              { label: "Programming", value: "programming" },
+              { label: "Open Source", value: "opensource" },
+            ],
+            ui: {
+              component: "select",
+            },
+          },
+          {
+            type: "string",
+            name: "tags",
+            label: "Tags",
+            list: true,
+            ui: {
+              component: "tags",
+            },
+          },
+          {
+            type: "boolean",
+            name: "draft",
+            label: "Draft",
+            description: "Enable to hide this post from production",
+          },
+          {
+            type: "number",
+            name: "readTime",
+            label: "Reading Time (minutes)",
+          },
+          {
+            type: "rich-text",
+            name: "body",
+            label: "Body",
+            isBody: true,
+            templates: [
+              {
+                name: "CodeBlock",
+                label: "Code Block",
+                inline: false,
+                fields: [
+                  {
+                    type: "string",
+                    name: "language",
+                    label: "Language",
+                    options: ["javascript", "typescript", "python", "bash", "json", "yaml", "html", "css", "sql", "go", "rust"],
+                  },
+                  {
+                    type: "string",
+                    name: "filename",
+                    label: "Filename",
+                  },
+                  {
+                    type: "string",
+                    name: "code",
+                    label: "Code",
+                    ui: {
+                      component: "code",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "page",
+        label: "Pages",
+        path: "src/content/pages",
         format: "md",
         fields: [
           {
@@ -45,17 +171,6 @@ export default defineConfig({
             label: "Description",
           },
           {
-            type: "datetime",
-            name: "pubDate",
-            label: "Date Published",
-            required: true,
-          },
-          {
-            type: "image",
-            name: "heroImage",
-            label: "Hero Image",
-          },
-          {
             type: "rich-text",
             name: "body",
             label: "Body",
@@ -66,5 +181,3 @@ export default defineConfig({
     ],
   },
 });
-
-// Trigger re-index: Baris ini ditambahkan untuk memicu sinkronisasi ulang skema ke TinaCloud

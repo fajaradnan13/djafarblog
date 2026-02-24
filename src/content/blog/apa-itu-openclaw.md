@@ -1,7 +1,11 @@
+---
 title: "Apa itu OpenClaw? Menghidupkan Kembali Legenda Captain Claw"
 description: "Mengenal OpenClaw, proyek open-source yang menghidupkan kembali game klasik Captain Claw dengan engine modern."
 pubDate: 2025-02-20T10:00:00Z
-heroImage: "/images/openclaw-banner.jpg"
+category: "opensource"
+tags: ["gaming", "cpp", "opensource", "retro"]
+draft: false
+---
 
 Pernahkah Anda mendengar nama Captain Claw? Bagi anak-anak yang tumbuh di era akhir 90-an, game platformer bajak laut kucing ini adalah salah satu judul paling ikonik sekaligus menantang di PC. Namun, menjalankan game lama di sistem operasi modern sering kali menjadi mimpi buruk. Inilah alasan mengapa proyek OpenClaw lahir.
 
@@ -15,11 +19,11 @@ Mengapa Proyek Ini Penting?
 
 Ada beberapa alasan mengapa komunitas menyambut hangat kehadiran OpenClaw:
 
-Kompatibilitas Modern: Game aslinya sering mengalami masalah grafis atau kecepatan di Windows 10 atau 11. OpenClaw berjalan mulus di sistem modern.
+- **Kompatibilitas Modern**: Game aslinya sering mengalami masalah grafis atau kecepatan di Windows 10 atau 11. OpenClaw berjalan mulus di sistem modern.
 
-Lintas Platform (Cross-Platform): Karena menggunakan SDL2, OpenClaw bisa dijalankan di Linux, macOS, dan bahkan perangkat handheld seperti Android atau Steam Deck.
+- **Lintas Platform (Cross-Platform)**: Karena menggunakan SDL2, OpenClaw bisa dijalankan di Linux, macOS, dan bahkan perangkat handheld seperti Android atau Steam Deck.
 
-Peningkatan Fitur: Engine baru ini memungkinkan dukungan resolusi layar lebar (widescreen), sesuatu yang tidak mungkin dilakukan di game aslinya yang terbatas pada rasio 4:3.
+- **Peningkatan Fitur**: Engine baru ini memungkinkan dukungan resolusi layar lebar (widescreen), sesuatu yang tidak mungkin dilakukan di game aslinya yang terbatas pada rasio 4:3.
 
 Cara Kerja OpenClaw
 

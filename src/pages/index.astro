@@ -1,443 +1,255 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
-/**
- * Mengambil semua postingan dari folder src/content/blog.
- * Kita menggunakan try-catch agar jika folder kosong, website tidak crash.
- */
 let posts = [];
 try {
-    const allPosts = await getCollection('blog');
+    const allPosts = await getCollection('blog', ({ data }) => {
+        return import.meta.env.PROD ? data.draft !== true : true;
+    });
     posts = allPosts.sort((a, b) => {
         const dateA = a.data.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
         const dateB = b.data.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
         return dateB - dateA;
     });
 } catch (error) {
-    console.error("Gagal memuat koleksi blog:", error);
+    console.error("Failed to load blog collection:", error);
 }
+
+const recentPosts = posts.slice(0, 3);
 ---
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daftar Tulisan | Djafar Blog</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-        :root {
-            --primary: #00f3ff;
-            --primary-glow: rgba(0, 243, 255, 0.15);
-            --primary-dark: #00b8cc;
-            --bg-dark: #05070a;
-            --bg-surface: #0f172a;
-            --bg-surface-light: #1e293b;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --text-secondary: #64748b;
-            --accent: #10b981;
-            --accent-glow: rgba(16, 185, 129, 0.15);
-            --danger: #ef4444;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(ellipse at 50% -20%, rgba(0, 243, 255, 0.08) 0%, transparent 50%),
-                linear-gradient(rgba(0, 243, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.015) 1px, transparent 1px);
-            background-size: 100% 100%, 60px 60px, 60px 60px;
-            color: var(--text-main);
-            line-height: 1.7;
-            min-height: 100vh;
-            padding-top: 5rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(5, 7, 10, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
-            padding: 1rem 0;
-        }
-
-        .nav-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo span { color: var(--primary); }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover { color: var(--primary); }
-
-        .nav-links a.active { color: var(--primary); }
-
-        /* Back Button */
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-bottom: 2rem;
-            transition: all 0.3s;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-
-        .back-button:hover {
-            color: var(--primary);
-            border-color: var(--primary);
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        /* Header */
-        header {
-            margin-bottom: 4rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .section-title {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin: 0 0 1rem 0;
-            color: var(--text-main);
-            line-height: 1.1;
-        }
-
-        h1 span {
-            color: var(--primary);
-            text-shadow: 0 0 30px var(--primary-glow);
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.25rem;
-            line-height: 1.6;
-        }
-
-        /* Post Grid */
-        .post-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 6rem;
-        }
-
-        .post-card {
-            background: var(--bg-surface);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 1.75rem;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .post-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .post-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-4px);
-            background: var(--bg-surface-light);
-            box-shadow: 0 10px 40px -10px var(--primary-glow);
-        }
-
-        .post-card:hover::before { opacity: 1; }
-
-        .post-category {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.7rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-
-        .post-card h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin: 0 0 0.75rem 0;
-            color: var(--text-main);
-            line-height: 1.4;
-            transition: color 0.3s;
-        }
-
-        .post-card:hover h3 { color: var(--primary); }
-
-        .post-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.6;
-        }
-
-        .post-meta {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .post-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 5rem 2rem;
-            border: 2px dashed rgba(148, 163, 184, 0.2);
-            border-radius: 24px;
-            background: var(--bg-surface);
-        }
-
-        .empty-state p {
-            color: var(--text-muted);
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-        }
-
-        /* Footer */
-        footer {
-            margin-top: 6rem;
-            padding: 4rem 0 2rem;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
-            text-align: center;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .footer-logo {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .footer-logo span { color: var(--primary); }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover { color: var(--primary); }
-
-        .footer-copyright {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 2rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            h1 { font-size: 2.5rem; }
-            .post-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <div class="container nav-content">
-            <a href="/" class="logo">
-                <span>&lt;</span> DJAFAR <span>/&gt;</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/" class="active">Home</a></li>
-                <li><a href="/blog" class="active">Blog</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="container">
-        <a href="/" class="back-button">
-            ← Kembali ke Beranda
-        </a>
-
-        <header>
-            <span class="section-title">🔒 JURNAL DIGITAL</span>
-            <h1>Arsip <span>Tulisan</span></h1>
-            <p class="subtitle">
-                Kumpulan catatan, tutorial, dan berbagi pengalaman. 
-                Membangun sistem yang aman dan mendokumentasikan setiap temuan.
+<Layout
+    title="Security Researcher & Developer"
+    description="Sharing knowledge about cybersecurity, programming, and open-source technologies. Tutorials, security research, and technical deep-dives."
+    type="profile"
+    currentPage="home"
+>
+    <!-- Hero Section -->
+    <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 bg-gradient-to-b from-primary-500/5 via-transparent to-transparent"></div>
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        
+        <!-- Grid Pattern -->
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        
+        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-dark-800 border border-terminal-border mb-8 animate-fade-in">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span class="text-sm text-gray-400 font-mono">Available for security research & development</span>
+            </div>
+            
+            <!-- Main Heading -->
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-100 mb-6 animate-slide-up">
+                Security Researcher <br />
+                <span class="gradient-text">& Developer</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-slide-up" style="animation-delay: 0.1s">
+                Exploring the intersection of cybersecurity, open-source software, 
+                and modern development practices. Building secure systems and sharing knowledge.
             </p>
-        </header>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s">
+                <a href="/blog" class="btn-primary group">
+                    Read Articles
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                </a>
+                <a href="/projects" class="btn-secondary">
+                    View Projects
+                </a>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-terminal-border animate-fade-in" style="animation-delay: 0.3s">
+                <div>
+                    <div class="text-3xl font-bold text-gray-100 mb-1">{posts.length}+</div>
+                    <div class="text-sm text-gray-500">Articles Published</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-gray-100 mb-1">5+</div>
+                    <div class="text-sm text-gray-500">Open Source Projects</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-gray-100 mb-1">100%</div>
+                    <div class="text-sm text-gray-500">Security Focused</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <main>
-            <div class="post-grid">
-                {posts.map((post) => (
-                    <a href={`/blog/${post.slug}/`} class="post-card">
-                        <span class="post-category">Blog</span>
-                        <h3>{post.data.title}</h3>
-                        <p>{post.data.description || "Baca selengkapnya mengenai topik ini..."}</p>
-                        <div class="post-meta">
-                            <span class="post-meta-item">
-                                <span>📅</span>
-                                {post.data.pubDate ? new Date(post.data.pubDate).toLocaleDateString('id-ID', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                }) : "Tanpa Tanggal"}
-                            </span>
-                            <span class="post-meta-item">
-                                <span>⏱️</span>
-                                {post.data.readTime || '5 min'}
-                            </span>
-                        </div>
-                    </a>
+    <!-- Featured Articles -->
+    <section class="py-20 bg-dark-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-100 mb-2">Featured Articles</h2>
+                    <p class="text-gray-400">Latest insights and tutorials</p>
+                </div>
+                <a href="/blog" class="hidden sm:flex items-center gap-2 text-primary-400 hover:text-primary-300 font-medium transition-colors">
+                    View all articles
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recentPosts.map((post) => (
+                    <article class="card group">
+                        <a href={`/blog/${post.slug}/`} class="block p-6">
+                            <!-- Category -->
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="tag">{post.data.category || 'Article'}</span>
+                                <span class="text-xs text-gray-500 font-mono">
+                                    {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                    })}
+                                </span>
+                            </div>
+                            
+                            <!-- Title -->
+                            <h3 class="text-xl font-bold text-gray-100 mb-3 group-hover:text-primary-400 transition-colors line-clamp-2">
+                                {post.data.title}
+                            </h3>
+                            
+                            <!-- Description -->
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                                {post.data.description}
+                            </p>
+                            
+                            <!-- Tags -->
+                            {post.data.tags && post.data.tags.length > 0 && (
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    {post.data.tags.slice(0, 3).map((tag) => (
+                                        <span class="text-xs text-gray-500 font-mono">#{tag}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </a>
+                    </article>
                 ))}
             </div>
             
-            {posts.length === 0 && (
-                <div class="empty-state">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
-                    <p>[ ERROR: NO_CONTENT_FOUND_IN_COLLECTION ]</p>
-                </div>
-            )}
-        </main>
-
-        <footer>
-            <div class="footer-content">
-                <a href="/" class="footer-logo">
-                    <span>&lt;</span> DJAFAR <span>/&gt;</span>
+            <div class="mt-8 text-center sm:hidden">
+                <a href="/blog" class="btn-secondary inline-flex items-center gap-2">
+                    View all articles
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
                 </a>
-                <div class="footer-links">
-                    <a href="/">Home</a>
-                    <a href="/blog">Blog</a>
-                    <a href="/about">About</a>
-                    <a href="/contact">Contact</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Topics Section -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-100 mb-2">Topics I Cover</h2>
+                <p class="text-gray-400">Deep dives into various areas of technology and security</p>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Security -->
+                <div class="card p-6">
+                    <div class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Security</h3>
+                    <p class="text-gray-400 text-sm">Vulnerability research, penetration testing, and security best practices.</p>
                 </div>
-                <div class="footer-copyright">
-                    TERMINAL_SESSION_END // {new Date().getFullYear()} — DJAFAR_PORTFOLIO
+                
+                <!-- Programming -->
+                <div class="card p-6">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Programming</h3>
+                    <p class="text-gray-400 text-sm">Tutorials and insights on modern programming languages and frameworks.</p>
+                </div>
+                
+                <!-- DevOps -->
+                <div class="card p-6">
+                    <div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">DevOps</h3>
+                    <p class="text-gray-400 text-sm">CI/CD, containerization, infrastructure as code, and cloud technologies.</p>
+                </div>
+                
+                <!-- Open Source -->
+                <div class="card p-6">
+                    <div class="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Open Source</h3>
+                    <p class="text-gray-400 text-sm">Contributing to and maintaining open-source projects.</p>
+                </div>
+                
+                <!-- Tutorials -->
+                <div class="card p-6">
+                    <div class="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Tutorials</h3>
+                    <p class="text-gray-400 text-sm">Step-by-step guides and how-tos for various technologies.</p>
+                </div>
+                
+                <!-- Technology -->
+                <div class="card p-6">
+                    <div class="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Technology</h3>
+                    <p class="text-gray-400 text-sm">Analysis and thoughts on emerging technologies and trends.</p>
                 </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </section>
 
-    <script>
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Add scroll effect to navbar
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            if (window.scrollY > 50) {
-                nav.style.background = 'rgba(5, 7, 10, 0.95)';
-            } else {
-                nav.style.background = 'rgba(5, 7, 10, 0.8)';
-            }
-        });
-    </script>
-</body>
-</html>
+    <!-- Newsletter CTA -->
+    <section class="py-20 bg-dark-800/50">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold text-gray-100 mb-4">Stay Updated</h2>
+            <p class="text-gray-400 mb-8">
+                Get notified when new articles are published. No spam, unsubscribe anytime.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input
+                    type="email"
+                    placeholder="Enter your email"
+                    class="flex-1 px-4 py-3 bg-dark-700 border border-terminal-border rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                <button class="btn-primary whitespace-nowrap">
+                    Subscribe
+                </button>
+            </div>
+        </div>
+    </section>
+</Layout>
 ``*

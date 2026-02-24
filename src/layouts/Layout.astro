@@ -1,23 +1,100 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SEO from '../components/SEO.astro';
+import SearchModal from '../components/SearchModal.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonicalURL?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  type?: 'website' | 'article' | 'profile';
+  tags?: string[];
+  currentPage?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  canonicalURL,
+  publishedTime,
+  modifiedTime,
+  type = 'website',
+  tags = [],
+  currentPage = 'home',
+} = Astro.props;
+
+const siteTitle = 'DJAFAR.BLOG';
+const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
+---
+
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Security & Performance Headers -->
+    <meta http-equiv="X-DNS-Prefetch-Control" content="on" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <SEO
+      title={fullTitle}
+      description={description}
+      image={image}
+      canonicalURL={canonicalURL}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      type={type}
+      tags={tags}
+    />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Header currentPage={currentPage} />
+    <SearchModal client:load />
+    
+    <main class="flex-1 pt-16">
+      <slot />
+    </main>
+    
+    <Footer />
+  </body>
 </html>
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+<style is:global>
+  /* Security: Prevent FOUC */
+  html {
+    background-color: #0a0a0a;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>

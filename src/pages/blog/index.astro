@@ -1,443 +1,158 @@
 ---
+import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
-/**
- * Mengambil semua postingan dari folder src/content/blog.
- * Kita menggunakan try-catch agar jika folder kosong, website tidak crash.
- */
-let posts = [];
-try {
-    const allPosts = await getCollection('blog');
-    posts = allPosts.sort((a, b) => {
-        const dateA = a.data.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
-        const dateB = b.data.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
-        return dateB - dateA;
-    });
-} catch (error) {
-    console.error("Gagal memuat koleksi blog:", error);
+const allPosts = await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+const posts = allPosts.sort((a, b) => {
+  const dateA = a.data.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
+  const dateB = b.data.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
+  return dateB - dateA;
+});
+
+const categories = posts.map(p => p.data.category).filter(Boolean);
+const uniqueCategories = categories.filter((cat, index, self) => self.indexOf(cat) === index);
+
+const allTags = posts.flatMap(p => p.data.tags || []);
+const uniqueTags = allTags.filter((tag, index, self) => self.indexOf(tag) === index);
+
+function calculateReadTime(body) {
+  const text = body.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '');
+  const words = text.split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
 }
 ---
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daftar Tulisan | Djafar Blog</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-        :root {
-            --primary: #00f3ff;
-            --primary-glow: rgba(0, 243, 255, 0.15);
-            --primary-dark: #00b8cc;
-            --bg-dark: #05070a;
-            --bg-surface: #0f172a;
-            --bg-surface-light: #1e293b;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --text-secondary: #64748b;
-            --accent: #10b981;
-            --accent-glow: rgba(16, 185, 129, 0.15);
-            --danger: #ef4444;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(ellipse at 50% -20%, rgba(0, 243, 255, 0.08) 0%, transparent 50%),
-                linear-gradient(rgba(0, 243, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.015) 1px, transparent 1px);
-            background-size: 100% 100%, 60px 60px, 60px 60px;
-            color: var(--text-main);
-            line-height: 1.7;
-            min-height: 100vh;
-            padding-top: 5rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(5, 7, 10, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
-            padding: 1rem 0;
-        }
-
-        .nav-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo span { color: var(--primary); }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover { color: var(--primary); }
-
-        .nav-links a.active { color: var(--primary); }
-
-        /* Back Button */
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-bottom: 2rem;
-            transition: all 0.3s;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-
-        .back-button:hover {
-            color: var(--primary);
-            border-color: var(--primary);
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        /* Header */
-        header {
-            margin-bottom: 4rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .section-title {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin: 0 0 1rem 0;
-            color: var(--text-main);
-            line-height: 1.1;
-        }
-
-        h1 span {
-            color: var(--primary);
-            text-shadow: 0 0 30px var(--primary-glow);
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.25rem;
-            line-height: 1.6;
-        }
-
-        /* Post Grid */
-        .post-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 6rem;
-        }
-
-        .post-card {
-            background: var(--bg-surface);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 1.75rem;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .post-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .post-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-4px);
-            background: var(--bg-surface-light);
-            box-shadow: 0 10px 40px -10px var(--primary-glow);
-        }
-
-        .post-card:hover::before { opacity: 1; }
-
-        .post-category {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.7rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-
-        .post-card h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin: 0 0 0.75rem 0;
-            color: var(--text-main);
-            line-height: 1.4;
-            transition: color 0.3s;
-        }
-
-        .post-card:hover h3 { color: var(--primary); }
-
-        .post-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.6;
-        }
-
-        .post-meta {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .post-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 5rem 2rem;
-            border: 2px dashed rgba(148, 163, 184, 0.2);
-            border-radius: 24px;
-            background: var(--bg-surface);
-        }
-
-        .empty-state p {
-            color: var(--text-muted);
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-        }
-
-        /* Footer */
-        footer {
-            margin-top: 6rem;
-            padding: 4rem 0 2rem;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
-            text-align: center;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .footer-logo {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .footer-logo span { color: var(--primary); }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover { color: var(--primary); }
-
-        .footer-copyright {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 2rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            h1 { font-size: 2.5rem; }
-            .post-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <div class="container nav-content">
-            <a href="/" class="logo">
-                <span>&lt;</span> DJAFAR <span>/&gt;</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/" class="active">Home</a></li>
-                <li><a href="/blog" class="active">Blog</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="container">
-        <a href="/" class="back-button">
-            ← Kembali ke Beranda
-        </a>
-
-        <header>
-            <span class="section-title">🔒 JURNAL DIGITAL</span>
-            <h1>Arsip <span>Tulisan</span></h1>
-            <p class="subtitle">
-                Kumpulan catatan, tutorial, dan berbagi pengalaman. 
-                Membangun sistem yang aman dan mendokumentasikan setiap temuan.
-            </p>
-        </header>
-
-        <main>
-            <div class="post-grid">
-                {posts.map((post) => (
-                    <a href={`/blog/${post.slug}/`} class="post-card">
-                        <span class="post-category">Blog</span>
-                        <h3>{post.data.title}</h3>
-                        <p>{post.data.description || "Baca selengkapnya mengenai topik ini..."}</p>
-                        <div class="post-meta">
-                            <span class="post-meta-item">
-                                <span>📅</span>
-                                {post.data.pubDate ? new Date(post.data.pubDate).toLocaleDateString('id-ID', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                }) : "Tanpa Tanggal"}
-                            </span>
-                            <span class="post-meta-item">
-                                <span>⏱️</span>
-                                {post.data.readTime || '5 min'}
-                            </span>
-                        </div>
-                    </a>
-                ))}
-            </div>
-            
-            {posts.length === 0 && (
-                <div class="empty-state">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
-                    <p>[ ERROR: NO_CONTENT_FOUND_IN_COLLECTION ]</p>
-                </div>
-            )}
-        </main>
-
-        <footer>
-            <div class="footer-content">
-                <a href="/" class="footer-logo">
-                    <span>&lt;</span> DJAFAR <span>/&gt;</span>
-                </a>
-                <div class="footer-links">
-                    <a href="/">Home</a>
-                    <a href="/blog">Blog</a>
-                    <a href="/about">About</a>
-                    <a href="/contact">Contact</a>
-                </div>
-                <div class="footer-copyright">
-                    TERMINAL_SESSION_END // {new Date().getFullYear()} — DJAFAR_PORTFOLIO
-                </div>
-            </div>
-        </footer>
+<Layout title="Blog" description="Articles, tutorials, and insights on cybersecurity, programming, and open-source technologies." currentPage="blog">
+  <section class="bg-dark-800/50 border-b border-terminal-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="max-w-3xl">
+        <h1 class="text-4xl sm:text-5xl font-bold text-gray-100 mb-4">
+          All <span class="gradient-text">Articles</span>
+        </h1>
+        <p class="text-xl text-gray-400">
+          Deep dives, tutorials, and thoughts on security, development, and technology.
+        </p>
+      </div>
     </div>
+  </section>
 
-    <script>
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div class="lg:col-span-3">
+        <div class="flex flex-col sm:flex-row gap-4 mb-8">
+          <div class="relative flex-1">
+            <input type="text" id="search-input" placeholder="Search articles..." class="w-full pl-10 pr-4 py-3 bg-dark-800 border border-terminal-border rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          </div>
+          <select id="category-filter" class="px-4 py-3 bg-dark-800 border border-terminal-border rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500">
+            <option value="">All Categories</option>
+            {uniqueCategories.map((cat) => {
+              const name = cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : 'Article';
+              return <option value={cat}>{name}</option>;
+            })}
+          </select>
+        </div>
 
-        // Add scroll effect to navbar
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            if (window.scrollY > 50) {
-                nav.style.background = 'rgba(5, 7, 10, 0.95)';
-            } else {
-                nav.style.background = 'rgba(5, 7, 10, 0.8)';
-            }
-        });
-    </script>
-</body>
-</html>
-``*
+        <div class="space-y-6" id="articles-grid">
+          {posts.map((post) => {
+            const readTime = calculateReadTime(post.body);
+            const pubDate = new Date(post.data.pubDate);
+            const dateStr = pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            return (
+              <article class="card group overflow-hidden">
+                <a href={`/blog/${post.slug}/`} class="block">
+                  <div class="p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                      {post.data.category ? <span class="tag">{post.data.category}</span> : null}
+                      <span class="text-sm text-gray-500 font-mono">{dateStr}</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-100 mb-3 group-hover:text-primary-400 transition-colors">{post.data.title}</h2>
+                    <p class="text-gray-400 mb-4 line-clamp-2">{post.data.description}</p>
+                    <div class="flex items-center justify-between">
+                      <div class="flex flex-wrap gap-2">
+                        {post.data.tags ? post.data.tags.slice(0, 3).map((tag) => <span class="text-xs text-gray-500 font-mono">#{tag}</span>) : null}
+                      </div>
+                      <span class="text-sm text-gray-500">{readTime} min read</span>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+
+        {posts.length === 0 ? (
+          <div class="text-center py-20">
+            <h3 class="text-xl font-semibold text-gray-100 mb-2">No articles found</h3>
+            <p class="text-gray-400">Check back soon for new content!</p>
+          </div>
+        ) : null}
+      </div>
+
+      <aside class="space-y-8">
+        <div class="card p-6">
+          <h3 class="text-lg font-semibold text-gray-100 mb-4">About the Author</h3>
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-cyan-400 flex items-center justify-center">
+              <span class="text-dark-900 font-bold text-lg">FA</span>
+            </div>
+            <div>
+              <div class="font-semibold text-gray-100">Fajar Adnan</div>
+              <div class="text-sm text-gray-500">Security Researcher</div>
+            </div>
+          </div>
+          <p class="text-gray-400 text-sm mb-4">Passionate about cybersecurity, open-source software, and sharing knowledge with the community.</p>
+          <a href="/about" class="btn-primary w-full justify-center">Learn More</a>
+        </div>
+
+        {uniqueTags.length > 0 ? (
+          <div class="card p-6">
+            <h3 class="text-lg font-semibold text-gray-100 mb-4">Popular Tags</h3>
+            <div class="flex flex-wrap gap-2">
+              {uniqueTags.slice(0, 15).map((tag) => <a href={`/blog?tag=${tag}`} class="tag">#{tag}</a>)}
+            </div>
+          </div>
+        ) : null}
+
+        <div class="card p-6">
+          <h3 class="text-lg font-semibold text-gray-100 mb-4">Stay Updated</h3>
+          <p class="text-gray-400 text-sm mb-4">Subscribe to the RSS feed to never miss an article.</p>
+          <a href="/rss.xml" class="btn-secondary w-full justify-center">Subscribe via RSS</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+  const categoryFilter = document.getElementById('category-filter');
+  const articlesGrid = document.getElementById('articles-grid');
+
+  function filterArticles() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedCategory = categoryFilter.value;
+    const articles = articlesGrid?.querySelectorAll('article');
+
+    articles?.forEach((article) => {
+      const title = article.querySelector('h2')?.textContent.toLowerCase() || '';
+      const description = article.querySelector('p')?.textContent.toLowerCase() || '';
+      const category = article.querySelector('.tag')?.textContent.toLowerCase() || '';
+
+      const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+      const matchesCategory = !selectedCategory || category.includes(selectedCategory);
+
+      if (matchesSearch && matchesCategory) {
+        article.removeAttribute('hidden');
+      } else {
+        article.setAttribute('hidden', '');
+      }
+    });
+  }
+
+  searchInput?.addEventListener('input', filterArticles);
+  categoryFilter?.addEventListener('change', filterArticles);
+</script>
