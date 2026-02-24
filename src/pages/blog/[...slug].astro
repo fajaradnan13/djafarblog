@@ -129,13 +129,26 @@ while ((match = headingRegex.exec(post.body)) !== null) {
           
           <!-- Hero Image -->
           {post.data.heroImage && (
-            <figure class="mb-10 rounded-xl overflow-hidden border border-terminal-border">
-              <img
-                src={post.data.heroImage.src}
-                alt={post.data.title}
-                class="w-full h-auto"
-                loading="lazy"
-              />
+            <figure class="mb-10">
+              <div class:list={[
+                'mx-auto rounded-xl overflow-hidden border border-terminal-border',
+                post.data.imageWidth === 'full' ? 'max-w-full' : null,
+                post.data.imageWidth === 'large' ? 'max-w-5xl' : null,
+                post.data.imageWidth === 'medium' ? 'max-w-3xl' : null,
+                post.data.imageWidth === 'small' ? 'max-w-xl' : null,
+              ]}>
+                <img
+                  src={post.data.heroImage.src}
+                  alt={post.data.title}
+                  class="w-full h-auto"
+                  loading="lazy"
+                />
+              </div>
+              {post.data.heroImage.alt && (
+                <figcaption class="text-center text-sm text-gray-500 mt-3">
+                  {post.data.heroImage.alt}
+                </figcaption>
+              )}
             </figure>
           )}
           

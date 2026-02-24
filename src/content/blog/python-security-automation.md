@@ -5,9 +5,14 @@ pubDate: 2025-02-24T10:00:00Z
 category: "security"
 tags: ["python", "security", "automation", "cybersecurity", "tutorial"]
 draft: false
+imageWidth: "large"
+heroImage: "/images/python-security-hero.jpg"
 ---
 
 Python adalah salah satu bahasa pemrograman paling populer di dunia cybersecurity. Dalam artikel ini, kita akan mempelajari bagaimana menggunakan Python untuk mengotomatisasi tugas-tugas keamanan siber.
+
+![Python Security Automation](https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=1200&h=630&fit=crop)
+*Gambar ilustrasi - Python untuk cybersecurity*
 
 ## Mengapa Python untuk Security?
 
@@ -17,6 +22,10 @@ Python memiliki beberapa keunggulan yang menjadikannya pilihan ideal untuk secur
 - **Library yang kaya** - Ribuan library untuk berbagai kebutuhan security
 - **Cross-platform** - Berjalan di Linux, Windows, dan macOS
 - **Community yang besar** - Banyak resource dan dukungan dari komunitas
+
+<img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&h=450&fit=crop" alt="Python Code" class="img-medium" />
+
+*Gambar di atas menggunakan class `img-medium` (800px) - cocok untuk ilustrasi kode*
 
 ## Setup Environment
 
@@ -38,9 +47,18 @@ venv\Scripts\activate  # Windows
 pip install requests socket nmap
 ```
 
+<img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop" alt="Terminal Setup" class="img-small" />
+
+*Gambar kecil menggunakan `img-small` (600px) - cocok untuk screenshot terminal*
+
 ## Membuat Port Scanner Sederhana
 
 Port scanning adalah teknik dasar untuk menemukan service yang berjalan di sebuah host. Berikut contoh port scanner sederhana:
+
+<figure>
+  <img src="https://images.unsplash.com/photo-1558494949-ef526b0042a0?w=1200&h=675&fit=crop" alt="Network Scanning" class="img-large" />
+  <figcaption class="img-caption">Ilustrasi network scanning dengan img-large (1200px)</figcaption>
+</figure>
 
 ```python
 #!/usr/bin/env python3
@@ -113,6 +131,8 @@ python3 port_scanner.py
 ## HTTP Security Header Checker
 
 Security headers adalah header HTTP yang meningkatkan keamanan website. Mari buat checker untuk menganalisis security headers:
+
+<img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=563&fit=crop" alt="Web Security Headers" class="img-medium" />
 
 ```python
 import requests
@@ -219,6 +239,8 @@ Ketika menulis code untuk security tools, perhatikan hal berikut:
 
 Selalu validasi input user untuk mencegah injection attacks:
 
+<img src="https://images.unsplash.com/photo-1563206767-5b1d972e813e?w=600&h=400&fit=crop" alt="Input Validation" class="img-small" />
+
 ```python
 import re
 import ipaddress
@@ -292,6 +314,11 @@ Python adalah tool yang powerful untuk security automation. Dengan mempelajari d
 2. Membuat custom tools untuk kebutuhan spesifik
 3. Mempercepat proses security assessment
 4. Meningkatkan efisiensi kerja sebagai security professional
+
+<figure>
+  <img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=1200&h=675&fit=crop" alt="Python Automation" class="img-full" />
+  <figcaption class="img-caption">Python automation dengan img-full (100% width) - cocok untuk banner atau penutup artikel</figcaption>
+</figure>
 
 ### Resources Lanjutan
 

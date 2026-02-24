@@ -82,6 +82,22 @@ export default defineConfig({
           },
           {
             type: "string",
+            name: "imageWidth",
+            label: "Hero Image Width",
+            description: "Control the width of hero image",
+            options: [
+              { label: "Full Width", value: "full" },
+              { label: "Large (1200px)", value: "large" },
+              { label: "Medium (800px)", value: "medium" },
+              { label: "Small (600px)", value: "small" },
+            ],
+            ui: {
+              component: "select",
+            },
+            default: "large",
+          },
+          {
+            type: "string",
             name: "category",
             label: "Category",
             options: [
