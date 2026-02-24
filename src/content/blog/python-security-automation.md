@@ -6,7 +6,6 @@ category: "security"
 tags: ["python", "security", "automation", "cybersecurity", "tutorial"]
 draft: false
 imageWidth: "large"
-heroImage: "/images/python-security-hero.jpg"
 ---
 
 Python adalah salah satu bahasa pemrograman paling populer di dunia cybersecurity. Dalam artikel ini, kita akan mempelajari bagaimana menggunakan Python untuk mengotomatisasi tugas-tugas keamanan siber.
