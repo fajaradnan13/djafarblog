@@ -243,8 +243,13 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   }
   
   /* Slide Content Styles */
+  .slide-section {
+    font-size: 1.125rem;
+    line-height: 1.8;
+  }
+  
   .slide-section h2 {
-    font-size: 1.875rem;
+    font-size: 2rem;
     font-weight: 700;
     margin: 1.5rem 0 1rem;
     color: inherit;
@@ -266,67 +271,128 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   
   .slide-section p {
     margin: 1rem 0;
-    line-height: 1.75;
+    line-height: 1.8;
     color: inherit;
   }
   
   .slide-section ul,
   .slide-section ol {
     margin: 1rem 0;
-    padding-left: 1.5rem;
+    padding-left: 2rem;
+  }
+  
+  .slide-section ul {
+    list-style-type: disc;
+  }
+  
+  .slide-section ol {
+    list-style-type: decimal;
   }
   
   .slide-section li {
-    margin: 0.5rem 0;
+    margin: 0.75rem 0;
     padding-left: 0.5rem;
   }
   
   .slide-section .code-block {
     background: #1e1e1e;
-    padding: 1rem;
+    padding: 1.25rem;
     border-radius: 0.5rem;
     overflow-x: auto;
-    margin: 1rem 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.875rem;
+    margin: 1.5rem 0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+  }
+  
+  .dark .slide-section .code-block {
+    background: #0d1117;
+    border-color: rgba(14, 165, 233, 0.3);
   }
   
   .slide-section .inline-code {
-    background: rgba(14, 165, 233, 0.1);
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
-    font-family: 'JetBrains Mono', monospace;
+    background: rgba(14, 165, 233, 0.15);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 0.875rem;
     color: #0EA5E9;
+    border: 1px solid rgba(14, 165, 233, 0.2);
   }
   
   .slide-section blockquote {
     border-left: 4px solid #3B82F6;
-    padding-left: 1rem;
-    margin: 1rem 0;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
     font-style: italic;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 0 0.5rem 0.5rem 0;
     color: inherit;
+  }
+  
+  .dark .slide-section blockquote {
+    background: rgba(59, 130, 246, 0.15);
   }
   
   .slide-section hr {
     border: none;
-    border-top: 1px solid rgba(14, 165, 233, 0.3);
-    margin: 1.5rem 0;
+    border-top: 2px solid rgba(14, 165, 233, 0.3);
+    margin: 2rem 0;
   }
   
   .slide-section img {
     max-width: 100%;
-    border-radius: 0.5rem;
-    margin: 1rem 0;
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
   
   .slide-section a {
     color: #3B82F6;
     text-decoration: underline;
+    font-weight: 500;
+  }
+  
+  .slide-section a:hover {
+    color: #2563EB;
   }
   
   .dark .slide-section a {
     color: #60A5FA;
+  }
+  
+  .dark .slide-section a:hover {
+    color: #3B82F6;
+  }
+  
+  /* Slide wrapper untuk scroll */
+  .slide-wrapper {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+    padding-right: 1rem;
+  }
+  
+  .slide-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .slide-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+  
+  .slide-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(14, 165, 233, 0.5);
+    border-radius: 4px;
+  }
+  
+  .slide-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(14, 165, 233, 0.7);
+  }
+  
+  .dark .slide-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
   }
 </style>
 
@@ -533,13 +599,20 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       
       slidesHTML += '<div class="slide active" data-slide="0">' +
         '<div class="slide-content-wrapper text-center py-20">' +
+        '<div class="mb-8">' +
+        '<div class="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center shadow-2xl mb-6">' +
+        '<svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />' +
+        '</svg>' +
+        '</div>' +
+        '</div>' +
         '<h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-primary-500 to-cyan-500 bg-clip-text text-transparent">' + escapeHtml(titleText) + '</h1>' +
-        '<p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">' + escapeHtml(descText) + '</p>' +
-        '<div class="mt-12 flex items-center justify-center gap-2 text-sm text-gray-500">' +
+        '<p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">' + escapeHtml(descText) + '</p>' +
+        '<div class="flex items-center justify-center gap-3 text-sm text-gray-500">' +
         '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />' +
         '</svg>' +
-        '<span>Press → or Space to start</span>' +
+        '<span>Press → or Space to start presentation</span>' +
         '</div>' +
         '</div>' +
         '</div>';
@@ -548,47 +621,15 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       slideSections.forEach(function(section, index) {
         var contentHtml = sectionToHtml(section.content);
         
-        // Wrap list items in ul/ol
-        contentHtml = contentHtml.replace(/<li>([\s\S]*?)<\/li>/g, function(match, p1) {
-          // Check if it's part of a list already
-          return match;
-        });
-        
-        // Simple list wrapping
-        var listBuffer = [];
-        var inList = false;
-        var listType = 'ul';
-        var finalHtml = '';
-        
-        contentHtml.split('\n').forEach(function(line) {
-          if (line.trim().startsWith('<li>')) {
-            if (!inList) {
-              inList = true;
-              listType = line.includes('•') ? 'ul' : 'ol';
-              finalHtml += '<' + listType + '>\n';
-            }
-            finalHtml += line + '\n';
-          } else {
-            if (inList) {
-              finalHtml += '</' + listType + '>\n';
-              inList = false;
-            }
-            if (line.trim()) {
-              finalHtml += line + '\n';
-            }
-          }
-        });
-        
-        if (inList) {
-          finalHtml += '</' + listType + '>\n';
-        }
+        // Wrap lists properly
+        contentHtml = wrapLists(contentHtml);
         
         slidesHTML += '<div class="slide" data-slide="' + (index + 1) + '">' +
           '<div class="slide-content-wrapper">' +
-          '<div class="slide-content">' +
-          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">' + escapeHtml(section.heading) + '</h2>' +
-          '<div class="prose prose-lg dark:prose-invert max-w-none slide-section">' +
-          finalHtml +
+          '<div class="slide-wrapper">' +
+          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b-2 border-primary-500/30">' + escapeHtml(section.heading) + '</h2>' +
+          '<div class="slide-section prose prose-lg dark:prose-invert max-w-none">' +
+          contentHtml +
           '</div>' +
           '</div>' +
           '</div>' +
@@ -596,6 +637,21 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       });
       
       slideContent.innerHTML = slidesHTML;
+    }
+    
+    // Helper to wrap consecutive <li> elements in <ul> or <ol>
+    function wrapLists(html) {
+      var result = html;
+      
+      // Wrap unordered lists (li with no number pattern)
+      result = result.replace(/(<li[^>]*>[\s\S]*?<\/li>\s*)+/g, function(match) {
+        if (match.indexOf('<li>') !== -1 && !match.match(/^\d+\./)) {
+          return '<ul class="list-disc">' + match + '</ul>';
+        }
+        return match;
+      });
+      
+      return result;
     }
     
     function renderDots() {

@@ -61,7 +61,7 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
   </head>
   <body class="min-h-screen flex flex-col bg-white dark:bg-dark-900">
     <Header currentPage={currentPage} />
-    <SearchModal client:load />
+    <SearchModal />
     
     <main class="flex-1 pt-16">
       <slot />
