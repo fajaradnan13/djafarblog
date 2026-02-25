@@ -71,9 +71,6 @@ const { currentPage = 'home' } = Astro.props;
 
       <!-- Mobile Menu Button -->
       <div class="flex md:hidden items-center gap-2">
-        <!-- Theme Toggle Mobile -->
-        <ThemeToggle client:load />
-
         <button
           id="mobile-menu-btn"
           class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg transition-colors"
@@ -92,12 +89,32 @@ const { currentPage = 'home' } = Astro.props;
     id="mobile-menu"
     class="hidden md:hidden bg-gray-50 dark:bg-dark-800 border-t border-gray-200 dark:border-terminal-border"
   >
-    <div class="px-4 py-4 space-y-3">
+    <div class="px-4 py-4 space-y-4">
+      <!-- Theme Toggle in Mobile Menu -->
+      <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-terminal-border">
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+        <ThemeToggle client:load />
+      </div>
+      
+      <!-- Navigation Links -->
       <a href="/" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-700 rounded-lg transition-colors">Home</a>
       <a href="/blog" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-700 rounded-lg transition-colors">Blog</a>
       <a href="/projects" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-700 rounded-lg transition-colors">Projects</a>
       <a href="/about" class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-700 rounded-lg transition-colors">About</a>
-      <div class="pt-3 border-t border-gray-200 dark:border-terminal-border">
+      
+      <!-- Search in Mobile Menu -->
+      <button
+        id="mobile-search-btn"
+        class="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-dark-700 border border-gray-300 dark:border-terminal-border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors"
+        aria-label="Search"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        Search
+      </button>
+      
+      <div class="pt-4 border-t border-gray-200 dark:border-terminal-border">
         <a
           href="https://github.com/fajaradnan13"
           target="_blank"
@@ -117,7 +134,7 @@ const { currentPage = 'home' } = Astro.props;
   // Mobile menu toggle
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
-  
+
   mobileMenuBtn?.addEventListener('click', () => {
     mobileMenu?.classList.toggle('hidden');
   });
@@ -128,6 +145,13 @@ const { currentPage = 'home' } = Astro.props;
       e.preventDefault();
       document.getElementById('search-btn')?.click();
     }
+  });
+
+  // Mobile search button
+  const mobileSearchBtn = document.getElementById('mobile-search-btn');
+  mobileSearchBtn?.addEventListener('click', () => {
+    document.getElementById('search-btn')?.click();
+    mobileMenu?.classList.add('hidden');
   });
 
   // Close mobile menu on route change
