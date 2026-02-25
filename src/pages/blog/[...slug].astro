@@ -40,7 +40,7 @@ const tagsMatch = post.body.match(/<!--\s*tags:\s*([^\n]+)\s*-->/);
 const bodyTags = tagsMatch ? tagsMatch[1].split(',').map(t => t.trim()).filter(Boolean) : [];
 const postTags = post.data.tags && post.data.tags.length > 0 ? post.data.tags : bodyTags;
 
-// Get headings for TOC and slides
+// Get headings for TOC
 const headings = [];
 const headingRegex = /^(#{2,3})\s+(.+)$/gm;
 let match;
@@ -50,45 +50,6 @@ while ((match = headingRegex.exec(post.body)) !== null) {
     slug: match[2].toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     text: match[2],
   });
-}
-
-// Create slide sections data - split content by H2/H3 headings
-const slideSections = [];
-const lines = post.body.split('\n');
-let currentSection = { heading: 'Introduction', slug: 'intro', content: [], depth: 2 };
-let inCodeBlock = false;
-
-for (let i = 0; i < lines.length; i++) {
-  const line = lines[i];
-  const headingMatch = line.match(/^(#{2,3})\s+(.+)$/);
-  
-  // Track code blocks to avoid matching headings inside code
-  if (line.trim().startsWith('```')) {
-    inCodeBlock = !inCodeBlock;
-    currentSection.content.push(line);
-    continue;
-  }
-  
-  if (headingMatch && !inCodeBlock) {
-    // Save previous section if it has content
-    if (currentSection.content.length > 0) {
-      slideSections.push(currentSection);
-    }
-    // Start new section
-    currentSection = {
-      heading: headingMatch[2],
-      slug: headingMatch[2].toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      depth: headingMatch[1].length,
-      content: [line]
-    };
-  } else {
-    currentSection.content.push(line);
-  }
-}
-
-// Add last section
-if (currentSection.content.length > 0) {
-  slideSections.push(currentSection);
 }
 ---
 
@@ -310,7 +271,7 @@ if (currentSection.content.length > 0) {
   </article>
   
   <!-- Slide Mode Component -->
-  <SlideMode headings={headings} slideSections={slideSections} />
+  <SlideMode headings={headings} />
 </Layout>
 
 <style>

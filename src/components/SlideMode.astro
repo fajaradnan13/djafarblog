@@ -5,19 +5,13 @@ interface Props {
     slug: string;
     text: string;
   }[];
-  slideSections?: {
-    heading: string;
-    slug: string;
-    depth: number;
-    content: string[];
-  }[];
 }
 
-const { headings = [], slideSections = [] } = Astro.props;
+const { headings = [] } = Astro.props;
 
 // Filter h2 and h3 headings for slides
 const slideHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
-const totalSlides = slideSections.length + 1; // +1 for title slide
+const totalSlides = slideHeadings.length + 1;
 ---
 
 <!-- Slide Mode Toggle Button -->
@@ -35,7 +29,7 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
 
 <!-- Slide Mode Overlay -->
 <div id="slide-mode-overlay" class="hidden fixed inset-0 z-50 bg-white dark:bg-dark-900"
-     data-slide-sections={JSON.stringify(slideSections)}
+     data-slide-headings={JSON.stringify(slideHeadings)}
      data-total-slides={totalSlides}>
   <!-- Slide Mode Header -->
   <div class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-gradient-to-r from-primary-500/90 to-cyan-500/90 backdrop-blur-sm">
@@ -127,8 +121,8 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   </div>
   
   <!-- Slide Content Container -->
-  <div id="slide-container" class="pt-24 pb-20 px-8 h-screen overflow-y-auto">
-    <div id="slide-content" class="max-w-5xl mx-auto">
+  <div id="slide-container" class="pt-24 pb-20 px-8 h-screen overflow-hidden">
+    <div id="slide-content" class="max-w-5xl mx-auto h-full">
       <!-- Slides will be injected here by JavaScript -->
     </div>
   </div>
@@ -164,21 +158,26 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   /* Slide Transitions */
   .slide {
     display: none;
-    animation: fadeIn 0.3s ease-in-out;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
   
   .slide.active {
     display: block;
+    opacity: 1;
+    transform: translateX(0);
+    animation: slideIn 0.4s ease-out;
   }
   
-  @keyframes fadeIn {
+  @keyframes slideIn {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateX(50px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0);
     }
   }
   
@@ -186,18 +185,38 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   .slide-content-wrapper {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 1rem;
-    padding: 2rem;
+    padding: 2.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    height: calc(100vh - 280px);
+    overflow-y: auto;
   }
   
   .dark .slide-content-wrapper {
     background: rgba(23, 23, 23, 0.95);
   }
   
+  .slide-content-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .slide-content-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+  
+  .slide-content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(14, 165, 233, 0.5);
+    border-radius: 4px;
+  }
+  
+  .dark .slide-content-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
   /* Navigation Dots */
   .slide-dot {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.4);
     cursor: pointer;
@@ -262,13 +281,6 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
     color: inherit;
   }
   
-  .slide-section h4 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 1rem 0 0.5rem;
-    color: inherit;
-  }
-  
   .slide-section p {
     margin: 1rem 0;
     line-height: 1.8;
@@ -294,7 +306,7 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
     padding-left: 0.5rem;
   }
   
-  .slide-section .code-block {
+  .slide-section pre {
     background: #1e1e1e;
     padding: 1.25rem;
     border-radius: 0.5rem;
@@ -306,16 +318,19 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
     border: 1px solid rgba(14, 165, 233, 0.2);
   }
   
-  .dark .slide-section .code-block {
+  .dark .slide-section pre {
     background: #0d1117;
     border-color: rgba(14, 165, 233, 0.3);
   }
   
-  .slide-section .inline-code {
+  .slide-section code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  
+  .slide-section p code {
     background: rgba(14, 165, 233, 0.15);
     padding: 0.2rem 0.5rem;
     border-radius: 0.375rem;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 0.875rem;
     color: #0EA5E9;
     border: 1px solid rgba(14, 165, 233, 0.2);
@@ -365,35 +380,6 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   .dark .slide-section a:hover {
     color: #3B82F6;
   }
-  
-  /* Slide wrapper untuk scroll */
-  .slide-wrapper {
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-    padding-right: 1rem;
-  }
-  
-  .slide-wrapper::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .slide-wrapper::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-  }
-  
-  .slide-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(14, 165, 233, 0.5);
-    border-radius: 4px;
-  }
-  
-  .slide-wrapper::-webkit-scrollbar-thumb:hover {
-    background: rgba(14, 165, 233, 0.7);
-  }
-  
-  .dark .slide-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-  }
 </style>
 
 <script>
@@ -401,12 +387,12 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
   function init() {
     // Get data from DOM
     var overlay = document.getElementById('slide-mode-overlay');
-    var slideSections = [];
+    var slideHeadings = [];
     var totalSlides = 1;
     
     if (overlay) {
       try {
-        slideSections = JSON.parse(overlay.dataset.slideSections || '[]');
+        slideHeadings = JSON.parse(overlay.dataset.slideHeadings || '[]');
         totalSlides = parseInt(overlay.dataset.totalSlides || '1');
       } catch (e) {
         console.error('Error parsing slide data:', e);
@@ -484,108 +470,6 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       }
     }
     
-    // Convert markdown line to HTML
-    function markdownToHtml(line) {
-      // Code blocks
-      if (line.trim().startsWith('```')) {
-        return line;
-      }
-      
-      // Inline code
-      line = line.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-      
-      // Bold
-      line = line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      
-      // Italic
-      line = line.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-      
-      // Links
-      line = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-      
-      // Images
-      line = line.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
-      
-      return line;
-    }
-    
-    // Convert section content to HTML
-    function sectionToHtml(content) {
-      var html = '';
-      var inCodeBlock = false;
-      var codeLang = '';
-      var codeContent = [];
-      
-      for (var i = 0; i < content.length; i++) {
-        var line = content[i];
-        var trimmedLine = line.trim();
-        
-        // Code block start
-        if (trimmedLine.startsWith('```') && !inCodeBlock) {
-          inCodeBlock = true;
-          codeLang = trimmedLine.replace('```', '') || 'text';
-          codeContent = [];
-          continue;
-        }
-        
-        // Code block end
-        if (trimmedLine.startsWith('```') && inCodeBlock) {
-          inCodeBlock = false;
-          html += '<pre class="code-block"><code class="language-' + codeLang + '">' + 
-            escapeHtml(codeContent.join('\n')) + '</code></pre>';
-          continue;
-        }
-        
-        if (inCodeBlock) {
-          codeContent.push(line);
-          continue;
-        }
-        
-        // Headings (skip H1, render H2-H6)
-        var headingMatch = line.match(/^(#{2,6})\s+(.+)$/);
-        if (headingMatch) {
-          var level = headingMatch[1].length;
-          html += '<h' + level + '>' + escapeHtml(headingMatch[2]) + '</h' + level + '>';
-          continue;
-        }
-        
-        // Horizontal rule
-        if (trimmedLine.startsWith('---') || trimmedLine.startsWith('***')) {
-          html += '<hr />';
-          continue;
-        }
-        
-        // Blockquote
-        if (trimmedLine.startsWith('>')) {
-          html += '<blockquote>' + markdownToHtml(trimmedLine.replace(/^>\s*/, '')) + '</blockquote>';
-          continue;
-        }
-        
-        // Unordered list
-        if (trimmedLine.match(/^[-*+]\s+/)) {
-          html += '<li>' + markdownToHtml(trimmedLine.replace(/^[-*+]\s+/, '')) + '</li>';
-          continue;
-        }
-        
-        // Ordered list
-        if (trimmedLine.match(/^\d+\.\s+/)) {
-          html += '<li>' + markdownToHtml(trimmedLine.replace(/^\d+\.\s+/, '')) + '</li>';
-          continue;
-        }
-        
-        // Empty line
-        if (trimmedLine === '') {
-          html += '<br />';
-          continue;
-        }
-        
-        // Paragraph
-        html += '<p>' + markdownToHtml(line) + '</p>';
-      }
-      
-      return html;
-    }
-    
     function renderSlides() {
       if (!slideContent) return;
       
@@ -593,12 +477,12 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       
       // Title Slide
       var articleTitle = document.querySelector('h1');
-      var articleDescription = document.querySelector('article p');
+      var articleDescription = document.querySelector('article > div > header p');
       var titleText = articleTitle ? articleTitle.textContent : 'Presentation';
       var descText = articleDescription ? articleDescription.textContent : '';
       
       slidesHTML += '<div class="slide active" data-slide="0">' +
-        '<div class="slide-content-wrapper text-center py-20">' +
+        '<div class="slide-content-wrapper text-center" style="display: flex; flex-direction: column; justify-content: center; min-height: 100%;">' +
         '<div class="mb-8">' +
         '<div class="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-r from-primary-500 to-cyan-500 flex items-center justify-center shadow-2xl mb-6">' +
         '<svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
@@ -617,20 +501,26 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
         '</div>' +
         '</div>';
       
-      // Content Slides from sections
-      slideSections.forEach(function(section, index) {
-        var contentHtml = sectionToHtml(section.content);
+      // Content Slides - get content from DOM based on heading slugs
+      slideHeadings.forEach(function(heading, index) {
+        var element = document.getElementById(heading.slug);
+        if (!element) return;
         
-        // Wrap lists properly
-        contentHtml = wrapLists(contentHtml);
+        // Get all content until next heading
+        var contentHTML = '';
+        var sibling = element.nextElementSibling;
+        
+        while (sibling && !isHeading(sibling)) {
+          var clone = sibling.cloneNode(true);
+          contentHTML += clone.outerHTML;
+          sibling = sibling.nextElementSibling;
+        }
         
         slidesHTML += '<div class="slide" data-slide="' + (index + 1) + '">' +
           '<div class="slide-content-wrapper">' +
-          '<div class="slide-wrapper">' +
-          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b-2 border-primary-500/30">' + escapeHtml(section.heading) + '</h2>' +
-          '<div class="slide-section prose prose-lg dark:prose-invert max-w-none">' +
-          contentHtml +
-          '</div>' +
+          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b-2 border-primary-500/30">' + escapeHtml(heading.text) + '</h2>' +
+          '<div class="slide-section">' +
+          contentHTML +
           '</div>' +
           '</div>' +
           '</div>';
@@ -639,25 +529,14 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       slideContent.innerHTML = slidesHTML;
     }
     
-    // Helper to wrap consecutive <li> elements in <ul> or <ol>
-    function wrapLists(html) {
-      var result = html;
-      
-      // Wrap unordered lists (li with no number pattern)
-      result = result.replace(/(<li[^>]*>[\s\S]*?<\/li>\s*)+/g, function(match) {
-        if (match.indexOf('<li>') !== -1 && !match.match(/^\d+\./)) {
-          return '<ul class="list-disc">' + match + '</ul>';
-        }
-        return match;
-      });
-      
-      return result;
+    function isHeading(element) {
+      return element && (element.tagName === 'H2' || element.tagName === 'H3');
     }
     
     function renderDots() {
       if (!slideDots) return;
       
-      var dotsHTML = slideSections.map(function(_, index) {
+      var dotsHTML = slideHeadings.map(function(_, index) {
         return '<div class="slide-dot ' + (index === 0 ? 'active' : '') + '" data-slide="' + index + '" title="Slide ' + (index + 1) + '"></div>';
       }).join('');
       
@@ -694,7 +573,8 @@ const totalSlides = slideSections.length + 1; // +1 for title slide
       loadDrawingsForSlide(currentSlide);
       
       // Scroll to top
-      if (slideContainer) slideContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      var wrapper = slideContent.querySelector('.slide.active .slide-content-wrapper');
+      if (wrapper) wrapper.scrollTop = 0;
       
       updateSlideInfo();
     }
