@@ -45,9 +45,14 @@ const headings = [];
 const headingRegex = /^(#{2,3})\s+(.+)$/gm;
 let match;
 while ((match = headingRegex.exec(post.body)) !== null) {
+  // Clean slug: lowercase, replace non-alphanumeric with dash, remove trailing dash
+  const slug = match[2].toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
+  
   headings.push({
     depth: match[1].length,
-    slug: match[2].toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    slug: slug,
     text: match[2],
   });
 }

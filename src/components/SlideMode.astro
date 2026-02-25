@@ -521,11 +521,23 @@ const totalSlides = slideHeadings.length + 1;
       
       // Content Slides - get content from DOM based on heading slugs
       slideHeadings.forEach(function(heading, index) {
-        var element = document.getElementById(heading.slug);
+        // Clean slug the same way as in the page
+        var cleanSlug = heading.slug.replace(/^-+|-+$/g, '');
+        var element = document.getElementById(cleanSlug);
+        
         if (!element) {
-          console.log('Element not found for slug:', heading.slug);
-          return;
+          console.warn('Element not found for slug:', cleanSlug, 'Original heading:', heading.text);
+          // Fallback: try to find by text content
+          var allHeadings = document.querySelectorAll('h2, h3');
+          allHeadings.forEach(function(h) {
+            if (h.textContent === heading.text) {
+              element = h;
+              console.log('Found element by text match:', element.id);
+            }
+          });
         }
+        
+        if (!element) return;
         
         // Get all content until next heading
         var contentHTML = '';
