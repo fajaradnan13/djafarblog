@@ -26,13 +26,13 @@ function calculateReadTime(body) {
 ---
 
 <Layout title="Blog" description="Articles, tutorials, and insights on cybersecurity, programming, and open-source technologies." currentPage="blog">
-  <section class="bg-dark-800/50 border-b border-terminal-border">
+  <section class="bg-gray-50 dark:bg-dark-800/50 border-b border-gray-200 dark:border-terminal-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="max-w-3xl">
-        <h1 class="text-4xl sm:text-5xl font-bold text-gray-100 mb-4">
+        <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           All <span class="gradient-text">Articles</span>
         </h1>
-        <p class="text-xl text-gray-400">
+        <p class="text-xl text-gray-600 dark:text-gray-400">
           Deep dives, tutorials, and thoughts on security, development, and technology.
         </p>
       </div>
@@ -44,9 +44,9 @@ function calculateReadTime(body) {
       <div class="lg:col-span-3">
         <div class="flex flex-col sm:flex-row gap-4 mb-8">
           <div class="relative flex-1">
-            <input type="text" id="search-input" placeholder="Search articles..." class="w-full pl-10 pr-4 py-3 bg-dark-800 border border-terminal-border rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+            <input type="text" id="search-input" placeholder="Search articles..." class="w-full pl-10 pr-4 py-3 bg-white dark:bg-dark-800 border border-gray-300 dark:border-terminal-border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           </div>
-          <select id="category-filter" class="px-4 py-3 bg-dark-800 border border-terminal-border rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500">
+          <select id="category-filter" class="px-4 py-3 bg-white dark:bg-dark-800 border border-gray-300 dark:border-terminal-border rounded-lg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500">
             <option value="">All Categories</option>
             {uniqueCategories.map((cat) => {
               const name = cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : 'Article';
@@ -67,15 +67,15 @@ function calculateReadTime(body) {
                   <div class="p-6">
                     <div class="flex items-center gap-3 mb-4">
                       {post.data.category ? <span class="tag">{post.data.category}</span> : null}
-                      <span class="text-sm text-gray-500 font-mono">{dateStr}</span>
+                      <span class="text-sm text-gray-500 dark:text-gray-400 font-mono">{dateStr}</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-100 mb-3 group-hover:text-primary-400 transition-colors">{post.data.title}</h2>
-                    <p class="text-gray-400 mb-4 line-clamp-2">{post.data.description}</p>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors">{post.data.title}</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{post.data.description}</p>
                     <div class="flex items-center justify-between">
                       <div class="flex flex-wrap gap-2">
-                        {post.data.tags ? post.data.tags.slice(0, 3).map((tag) => <span class="text-xs text-gray-500 font-mono">#{tag}</span>) : null}
+                        {post.data.tags ? post.data.tags.slice(0, 3).map((tag) => <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">#{tag}</span>) : null}
                       </div>
-                      <span class="text-sm text-gray-500">{readTime} min read</span>
+                      <span class="text-sm text-gray-500 dark:text-gray-400">{readTime} min read</span>
                     </div>
                   </div>
                 </a>
@@ -86,31 +86,31 @@ function calculateReadTime(body) {
 
         {posts.length === 0 ? (
           <div class="text-center py-20">
-            <h3 class="text-xl font-semibold text-gray-100 mb-2">No articles found</h3>
-            <p class="text-gray-400">Check back soon for new content!</p>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No articles found</h3>
+            <p class="text-gray-600 dark:text-gray-400">Check back soon for new content!</p>
           </div>
         ) : null}
       </div>
 
       <aside class="space-y-8">
         <div class="card p-6">
-          <h3 class="text-lg font-semibold text-gray-100 mb-4">About the Author</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">About the Author</h3>
           <div class="flex items-center gap-4 mb-4">
             <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-cyan-400 flex items-center justify-center">
               <span class="text-dark-900 font-bold text-lg">FA</span>
             </div>
             <div>
-              <div class="font-semibold text-gray-100">Fajar Adnan</div>
-              <div class="text-sm text-gray-500">Security Researcher</div>
+              <div class="font-semibold text-gray-900 dark:text-gray-100">Fajar Adnan</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Security Researcher</div>
             </div>
           </div>
-          <p class="text-gray-400 text-sm mb-4">Passionate about cybersecurity, open-source software, and sharing knowledge with the community.</p>
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Passionate about cybersecurity, open-source software, and sharing knowledge with the community.</p>
           <a href="/about" class="btn-primary w-full justify-center">Learn More</a>
         </div>
 
         {uniqueTags.length > 0 ? (
           <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-100 mb-4">Popular Tags</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Popular Tags</h3>
             <div class="flex flex-wrap gap-2">
               {uniqueTags.slice(0, 15).map((tag) => <a href={`/blog?tag=${tag}`} class="tag">#{tag}</a>)}
             </div>
@@ -118,8 +118,8 @@ function calculateReadTime(body) {
         ) : null}
 
         <div class="card p-6">
-          <h3 class="text-lg font-semibold text-gray-100 mb-4">Stay Updated</h3>
-          <p class="text-gray-400 text-sm mb-4">Subscribe to the RSS feed to never miss an article.</p>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Stay Updated</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Subscribe to the RSS feed to never miss an article.</p>
           <a href="/rss.xml" class="btn-secondary w-full justify-center">Subscribe via RSS</a>
         </div>
       </aside>

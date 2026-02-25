@@ -34,20 +34,20 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    
+
     <!-- Security & Performance Headers -->
     <meta http-equiv="X-DNS-Prefetch-Control" content="on" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    
+
     <!-- Preconnect to external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
+
     <SEO
       title={fullTitle}
       description={description}
@@ -59,7 +59,7 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
       tags={tags}
     />
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body class="min-h-screen flex flex-col bg-white dark:bg-dark-900">
     <Header currentPage={currentPage} />
     <SearchModal client:load />
     

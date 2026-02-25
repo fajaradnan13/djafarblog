@@ -188,12 +188,12 @@
   }
 
   .toc-link {
-    @apply block py-1.5 text-sm text-gray-400 hover:text-gray-100 transition-colors duration-200;
+    @apply block py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200;
     @apply border-l-2 border-transparent hover:border-primary-500 pl-3;
   }
 
   .toc-link.active {
-    @apply text-primary-400 border-primary-500 font-medium;
+    @apply text-primary-500 dark:text-primary-400 border-primary-500 font-medium;
   }
 
   .tag {

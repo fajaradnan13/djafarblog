@@ -2,7 +2,7 @@
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="bg-dark-800 border-t border-terminal-border mt-20">
+<footer class="bg-gray-50 dark:bg-dark-800 border-t border-gray-200 dark:border-terminal-border mt-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
       <!-- Brand -->
@@ -11,12 +11,12 @@ const currentYear = new Date().getFullYear();
           <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-cyan-400 flex items-center justify-center">
             <span class="text-dark-900 font-bold font-mono text-sm">&lt;/&gt;</span>
           </div>
-          <span class="font-bold text-lg text-gray-100">
-            DJAFAR<span class="text-primary-400">.BLOG</span>
+          <span class="font-bold text-lg text-gray-900 dark:text-gray-100">
+            DJAFAR<span class="text-primary-500 dark:text-primary-400">.BLOG</span>
           </span>
         </a>
-        <p class="text-gray-400 text-sm leading-relaxed max-w-md">
-          Security researcher & developer. Sharing knowledge about cybersecurity, 
+        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed max-w-md">
+          Security researcher & developer. Sharing knowledge about cybersecurity,
           programming, and open-source technologies.
         </p>
         
@@ -69,45 +69,45 @@ const currentYear = new Date().getFullYear();
 
       <!-- Quick Links -->
       <div>
-        <h3 class="text-sm font-semibold text-gray-100 uppercase tracking-wider mb-4">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
           Navigation
         </h3>
         <ul class="space-y-3">
-          <li><a href="/" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Home</a></li>
-          <li><a href="/blog" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Blog</a></li>
-          <li><a href="/projects" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Projects</a></li>
-          <li><a href="/about" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">About</a></li>
+          <li><a href="/" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Home</a></li>
+          <li><a href="/blog" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Blog</a></li>
+          <li><a href="/projects" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Projects</a></li>
+          <li><a href="/about" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">About</a></li>
         </ul>
       </div>
 
       <!-- Categories -->
       <div>
-        <h3 class="text-sm font-semibold text-gray-100 uppercase tracking-wider mb-4">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
           Categories
         </h3>
         <ul class="space-y-3">
-          <li><a href="/blog?category=security" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Security</a></li>
-          <li><a href="/blog?category=technology" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Technology</a></li>
-          <li><a href="/blog?category=tutorial" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Tutorials</a></li>
-          <li><a href="/blog?category=opensource" class="text-gray-400 hover:text-primary-400 text-sm transition-colors">Open Source</a></li>
+          <li><a href="/blog?category=security" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Security</a></li>
+          <li><a href="/blog?category=technology" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Technology</a></li>
+          <li><a href="/blog?category=tutorial" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Tutorials</a></li>
+          <li><a href="/blog?category=opensource" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">Open Source</a></li>
         </ul>
       </div>
     </div>
 
     <!-- Bottom Bar -->
-    <div class="mt-12 pt-8 border-t border-terminal-border">
+    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-terminal-border">
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <p class="text-gray-500 text-sm font-mono">
+        <p class="text-gray-600 dark:text-gray-500 text-sm font-mono">
           © {currentYear} DJAFAR.BLOG — All rights reserved.
         </p>
         <div class="flex items-center gap-6">
-          <a href="/rss.xml" class="text-gray-500 hover:text-primary-400 text-sm transition-colors flex items-center gap-1.5">
+          <a href="/rss.xml" class="text-gray-600 dark:text-gray-500 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z" />
             </svg>
             RSS
           </a>
-          <a href="/sitemap.xml" class="text-gray-500 hover:text-primary-400 text-sm transition-colors">
+          <a href="/sitemap.xml" class="text-gray-600 dark:text-gray-500 hover:text-primary-500 dark:hover:text-primary-400 text-sm transition-colors">
             Sitemap
           </a>
         </div>

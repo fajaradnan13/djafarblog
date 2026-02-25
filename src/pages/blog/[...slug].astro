@@ -70,7 +70,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
         <!-- Main Content -->
         <div class="lg:col-span-8 xl:col-span-9">
           <!-- Back Button -->
-          <a href="/blog" class="inline-flex items-center gap-2 text-gray-400 hover:text-primary-400 transition-colors mb-8 group">
+          <a href="/blog" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors mb-8 group">
             <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
@@ -84,7 +84,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
               {post.data.category ? (
                 <span class="tag uppercase">{post.data.category}</span>
               ) : null}
-              <span class="text-sm text-gray-500 dark:text-gray-500 font-mono">
+              <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">
                 {new Date(post.data.pubDate).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
@@ -92,7 +92,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
                 })}
               </span>
               {post.data.updatedDate && (
-                <span class="text-sm text-gray-500 dark:text-gray-500 font-mono">
+                <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">
                   • Updated {new Date(post.data.updatedDate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric'
@@ -119,11 +119,11 @@ while ((match = headingRegex.exec(post.body)) !== null) {
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-900 dark:text-gray-100">Fajar Adnan</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-500">Security Researcher</div>
+                  <div class="text-xs text-gray-600 dark:text-gray-400">Security Researcher</div>
                 </div>
               </div>
               <div class="h-8 w-px bg-gray-200 dark:bg-terminal-border"></div>
-              <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-500">
+              <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -150,7 +150,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
                 />
               </div>
               {post.data.heroImage.alt && (
-                <figcaption class="text-center text-sm text-gray-500 mt-3">
+                <figcaption class="text-center text-sm text-gray-600 dark:text-gray-400 mt-3">
                   {post.data.heroImage.alt}
                 </figcaption>
               )}
@@ -174,12 +174,12 @@ while ((match = headingRegex.exec(post.body)) !== null) {
           )}
           
           <!-- Share Section -->
-          <div class="mt-10 pt-8 border-t border-terminal-border">
-            <h3 class="text-sm font-semibold text-gray-100 uppercase tracking-wider mb-4">
+          <div class="mt-10 pt-8 border-t border-gray-200 dark:border-terminal-border">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
               Share this article
             </h3>
             <div class="flex gap-3">
-              <a 
+              <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(Astro.url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -226,14 +226,14 @@ while ((match = headingRegex.exec(post.body)) !== null) {
           
           <!-- Post Navigation -->
           {(prevPost || nextPost) && (
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 pt-10 border-t border-terminal-border">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 pt-10 border-t border-gray-200 dark:border-terminal-border">
               {prevPost && (
                 <a href={`/blog/${prevPost.slug}/`} class="card p-5 group">
-                  <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">← Previous</div>
-                  <h4 class="text-lg font-semibold text-gray-100 group-hover:text-primary-400 transition-colors line-clamp-2">
+                  <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">← Previous</div>
+                  <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
                     {prevPost.data.title}
                   </h4>
-                  <div class="text-sm text-gray-500 mt-2">
+                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                     {new Date(prevPost.data.pubDate).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -244,11 +244,11 @@ while ((match = headingRegex.exec(post.body)) !== null) {
               )}
               {nextPost && (
                 <a href={`/blog/${nextPost.slug}/`} class="card p-5 group md:ml-auto">
-                  <div class="text-xs text-gray-500 uppercase tracking-wider mb-2 text-right">Next →</div>
-                  <h4 class="text-lg font-semibold text-gray-100 group-hover:text-primary-400 transition-colors line-clamp-2">
+                  <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 text-right">Next →</div>
+                  <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
                     {nextPost.data.title}
                   </h4>
-                  <div class="text-sm text-gray-500 mt-2">
+                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                     {new Date(nextPost.data.pubDate).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
