@@ -5,13 +5,19 @@ interface Props {
     slug: string;
     text: string;
   }[];
+  slideSections?: {
+    heading: string;
+    slug: string;
+    depth: number;
+    content: string[];
+  }[];
 }
 
-const { headings = [] } = Astro.props;
+const { headings = [], slideSections = [] } = Astro.props;
 
 // Filter h2 and h3 headings for slides
 const slideHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
-const totalSlides = slideHeadings.length + 1;
+const totalSlides = slideSections.length + 1; // +1 for title slide
 ---
 
 <!-- Slide Mode Toggle Button -->
@@ -29,7 +35,7 @@ const totalSlides = slideHeadings.length + 1;
 
 <!-- Slide Mode Overlay -->
 <div id="slide-mode-overlay" class="hidden fixed inset-0 z-50 bg-white dark:bg-dark-900"
-     data-slide-headings={JSON.stringify(slideHeadings)}
+     data-slide-sections={JSON.stringify(slideSections)}
      data-total-slides={totalSlides}>
   <!-- Slide Mode Header -->
   <div class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-gradient-to-r from-primary-500/90 to-cyan-500/90 backdrop-blur-sm">
@@ -235,6 +241,93 @@ const totalSlides = slideHeadings.length + 1;
   .shortcuts-help.visible {
     opacity: 1;
   }
+  
+  /* Slide Content Styles */
+  .slide-section h2 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin: 1.5rem 0 1rem;
+    color: inherit;
+  }
+  
+  .slide-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 1.25rem 0 0.75rem;
+    color: inherit;
+  }
+  
+  .slide-section h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+    color: inherit;
+  }
+  
+  .slide-section p {
+    margin: 1rem 0;
+    line-height: 1.75;
+    color: inherit;
+  }
+  
+  .slide-section ul,
+  .slide-section ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  
+  .slide-section li {
+    margin: 0.5rem 0;
+    padding-left: 0.5rem;
+  }
+  
+  .slide-section .code-block {
+    background: #1e1e1e;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+  }
+  
+  .slide-section .inline-code {
+    background: rgba(14, 165, 233, 0.1);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    color: #0EA5E9;
+  }
+  
+  .slide-section blockquote {
+    border-left: 4px solid #3B82F6;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: inherit;
+  }
+  
+  .slide-section hr {
+    border: none;
+    border-top: 1px solid rgba(14, 165, 233, 0.3);
+    margin: 1.5rem 0;
+  }
+  
+  .slide-section img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+  
+  .slide-section a {
+    color: #3B82F6;
+    text-decoration: underline;
+  }
+  
+  .dark .slide-section a {
+    color: #60A5FA;
+  }
 </style>
 
 <script>
@@ -242,12 +335,12 @@ const totalSlides = slideHeadings.length + 1;
   function init() {
     // Get data from DOM
     var overlay = document.getElementById('slide-mode-overlay');
-    var slideHeadings = [];
+    var slideSections = [];
     var totalSlides = 1;
     
     if (overlay) {
       try {
-        slideHeadings = JSON.parse(overlay.dataset.slideHeadings || '[]');
+        slideSections = JSON.parse(overlay.dataset.slideSections || '[]');
         totalSlides = parseInt(overlay.dataset.totalSlides || '1');
       } catch (e) {
         console.error('Error parsing slide data:', e);
@@ -325,11 +418,110 @@ const totalSlides = slideHeadings.length + 1;
       }
     }
     
+    // Convert markdown line to HTML
+    function markdownToHtml(line) {
+      // Code blocks
+      if (line.trim().startsWith('```')) {
+        return line;
+      }
+      
+      // Inline code
+      line = line.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+      
+      // Bold
+      line = line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // Italic
+      line = line.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      
+      // Links
+      line = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      
+      // Images
+      line = line.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+      
+      return line;
+    }
+    
+    // Convert section content to HTML
+    function sectionToHtml(content) {
+      var html = '';
+      var inCodeBlock = false;
+      var codeLang = '';
+      var codeContent = [];
+      
+      for (var i = 0; i < content.length; i++) {
+        var line = content[i];
+        var trimmedLine = line.trim();
+        
+        // Code block start
+        if (trimmedLine.startsWith('```') && !inCodeBlock) {
+          inCodeBlock = true;
+          codeLang = trimmedLine.replace('```', '') || 'text';
+          codeContent = [];
+          continue;
+        }
+        
+        // Code block end
+        if (trimmedLine.startsWith('```') && inCodeBlock) {
+          inCodeBlock = false;
+          html += '<pre class="code-block"><code class="language-' + codeLang + '">' + 
+            escapeHtml(codeContent.join('\n')) + '</code></pre>';
+          continue;
+        }
+        
+        if (inCodeBlock) {
+          codeContent.push(line);
+          continue;
+        }
+        
+        // Headings (skip H1, render H2-H6)
+        var headingMatch = line.match(/^(#{2,6})\s+(.+)$/);
+        if (headingMatch) {
+          var level = headingMatch[1].length;
+          html += '<h' + level + '>' + escapeHtml(headingMatch[2]) + '</h' + level + '>';
+          continue;
+        }
+        
+        // Horizontal rule
+        if (trimmedLine.startsWith('---') || trimmedLine.startsWith('***')) {
+          html += '<hr />';
+          continue;
+        }
+        
+        // Blockquote
+        if (trimmedLine.startsWith('>')) {
+          html += '<blockquote>' + markdownToHtml(trimmedLine.replace(/^>\s*/, '')) + '</blockquote>';
+          continue;
+        }
+        
+        // Unordered list
+        if (trimmedLine.match(/^[-*+]\s+/)) {
+          html += '<li>' + markdownToHtml(trimmedLine.replace(/^[-*+]\s+/, '')) + '</li>';
+          continue;
+        }
+        
+        // Ordered list
+        if (trimmedLine.match(/^\d+\.\s+/)) {
+          html += '<li>' + markdownToHtml(trimmedLine.replace(/^\d+\.\s+/, '')) + '</li>';
+          continue;
+        }
+        
+        // Empty line
+        if (trimmedLine === '') {
+          html += '<br />';
+          continue;
+        }
+        
+        // Paragraph
+        html += '<p>' + markdownToHtml(line) + '</p>';
+      }
+      
+      return html;
+    }
+    
     function renderSlides() {
       if (!slideContent) return;
-      
-      var articleContent = document.querySelector('article');
-      if (!articleContent) return;
       
       var slidesHTML = '';
       
@@ -352,36 +544,51 @@ const totalSlides = slideHeadings.length + 1;
         '</div>' +
         '</div>';
       
-      // Content Slides
-      slideHeadings.forEach(function(heading, index) {
-        var element = document.getElementById(heading.slug);
-        if (!element) return;
+      // Content Slides from sections
+      slideSections.forEach(function(section, index) {
+        var contentHtml = sectionToHtml(section.content);
         
-        var contentHTML = '';
-        var nextElement = element.nextElementSibling;
+        // Wrap list items in ul/ol
+        contentHtml = contentHtml.replace(/<li>([\s\S]*?)<\/li>/g, function(match, p1) {
+          // Check if it's part of a list already
+          return match;
+        });
         
-        // Collect content until next h2/h3 heading
-        while (nextElement && ['H2', 'H3'].indexOf(nextElement.tagName) === -1) {
-          var clone = nextElement.cloneNode(true);
-          
-          // Handle code blocks
-          if (clone.tagName === 'PRE') {
-            contentHTML += '<pre>' + clone.innerHTML + '</pre>';
-          } else if (clone.tagName === 'IMG') {
-            contentHTML += '<img src="' + clone.src + '" alt="' + (clone.alt || '') + '" />';
+        // Simple list wrapping
+        var listBuffer = [];
+        var inList = false;
+        var listType = 'ul';
+        var finalHtml = '';
+        
+        contentHtml.split('\n').forEach(function(line) {
+          if (line.trim().startsWith('<li>')) {
+            if (!inList) {
+              inList = true;
+              listType = line.includes('•') ? 'ul' : 'ol';
+              finalHtml += '<' + listType + '>\n';
+            }
+            finalHtml += line + '\n';
           } else {
-            contentHTML += clone.outerHTML;
+            if (inList) {
+              finalHtml += '</' + listType + '>\n';
+              inList = false;
+            }
+            if (line.trim()) {
+              finalHtml += line + '\n';
+            }
           }
-          
-          nextElement = nextElement.nextElementSibling;
+        });
+        
+        if (inList) {
+          finalHtml += '</' + listType + '>\n';
         }
         
         slidesHTML += '<div class="slide" data-slide="' + (index + 1) + '">' +
           '<div class="slide-content-wrapper">' +
           '<div class="slide-content">' +
-          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">' + escapeHtml(heading.text) + '</h2>' +
-          '<div class="prose prose-lg dark:prose-invert max-w-none">' +
-          contentHTML +
+          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">' + escapeHtml(section.heading) + '</h2>' +
+          '<div class="prose prose-lg dark:prose-invert max-w-none slide-section">' +
+          finalHtml +
           '</div>' +
           '</div>' +
           '</div>' +
@@ -394,7 +601,7 @@ const totalSlides = slideHeadings.length + 1;
     function renderDots() {
       if (!slideDots) return;
       
-      var dotsHTML = slideHeadings.map(function(_, index) {
+      var dotsHTML = slideSections.map(function(_, index) {
         return '<div class="slide-dot ' + (index === 0 ? 'active' : '') + '" data-slide="' + index + '" title="Slide ' + (index + 1) + '"></div>';
       }).join('');
       
