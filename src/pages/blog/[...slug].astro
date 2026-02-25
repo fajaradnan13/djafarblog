@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import ReadingProgress from '../../components/ReadingProgress.astro';
+import SlideMode from '../../components/SlideMode.astro';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog', ({ data }) => {
@@ -268,6 +269,9 @@ while ((match = headingRegex.exec(post.body)) !== null) {
       </div>
     </div>
   </article>
+  
+  <!-- Slide Mode Component -->
+  <SlideMode headings={headings} client:load />
 </Layout>
 
 <style>
