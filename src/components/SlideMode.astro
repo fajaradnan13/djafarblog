@@ -432,10 +432,28 @@ const totalSlides = slideHeadings.length + 1;
     function initSlideMode() {
       if (!slideModeToggle || !slideModeOverlay) return;
       
-      slideModeToggle.addEventListener('click', toggleSlideMode);
+      slideModeToggle.addEventListener('click', function() {
+        console.log('Slide mode toggle clicked');
+        toggleSlideMode();
+      });
+      
       if (slideClose) slideClose.addEventListener('click', toggleSlideMode);
-      if (slidePrev) slidePrev.addEventListener('click', function() { goToSlide(currentSlide - 1); });
-      if (slideNext) slideNext.addEventListener('click', function() { goToSlide(currentSlide + 1); });
+      
+      if (slidePrev) {
+        slidePrev.addEventListener('click', function(e) {
+          e.preventDefault();
+          console.log('Prev button clicked, current:', currentSlide);
+          goToSlide(currentSlide - 1);
+        });
+      }
+      
+      if (slideNext) {
+        slideNext.addEventListener('click', function(e) {
+          e.preventDefault();
+          console.log('Next button clicked, current:', currentSlide);
+          goToSlide(currentSlide + 1);
+        });
+      }
       
       // Keyboard shortcuts
       document.addEventListener('keydown', handleKeyboard);
@@ -477,7 +495,7 @@ const totalSlides = slideHeadings.length + 1;
       
       // Title Slide
       var articleTitle = document.querySelector('h1');
-      var articleDescription = document.querySelector('article > div > header p');
+      var articleDescription = document.querySelector('article p');
       var titleText = articleTitle ? articleTitle.textContent : 'Presentation';
       var descText = articleDescription ? articleDescription.textContent : '';
       
@@ -504,7 +522,10 @@ const totalSlides = slideHeadings.length + 1;
       // Content Slides - get content from DOM based on heading slugs
       slideHeadings.forEach(function(heading, index) {
         var element = document.getElementById(heading.slug);
-        if (!element) return;
+        if (!element) {
+          console.log('Element not found for slug:', heading.slug);
+          return;
+        }
         
         // Get all content until next heading
         var contentHTML = '';
@@ -527,6 +548,7 @@ const totalSlides = slideHeadings.length + 1;
       });
       
       slideContent.innerHTML = slidesHTML;
+      console.log('Slides rendered:', slideContent.querySelectorAll('.slide').length, 'slides');
     }
     
     function isHeading(element) {
@@ -557,16 +579,31 @@ const totalSlides = slideHeadings.length + 1;
       var slides = slideContent ? slideContent.querySelectorAll('.slide') : [];
       var dots = slideDots ? slideDots.querySelectorAll('.slide-dot') : [];
       
-      if (!slides || !dots) return;
+      if (!slides || !dots || slides.length === 0) {
+        console.log('No slides found!', slides.length);
+        return;
+      }
+      
+      console.log('Going to slide:', index, 'of', totalSlides, 'Total slides DOM:', slides.length);
       
       // Hide current slide
-      if (slides[currentSlide]) slides[currentSlide].classList.remove('active');
-      if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+      if (slides[currentSlide]) {
+        slides[currentSlide].classList.remove('active');
+        console.log('Removed active from slide', currentSlide);
+      }
+      if (dots[currentSlide]) {
+        dots[currentSlide].classList.remove('active');
+      }
       
       // Show new slide
       currentSlide = index;
-      if (slides[currentSlide]) slides[currentSlide].classList.add('active');
-      if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+      if (slides[currentSlide]) {
+        slides[currentSlide].classList.add('active');
+        console.log('Added active to slide', currentSlide);
+      }
+      if (dots[currentSlide]) {
+        dots[currentSlide].classList.add('active');
+      }
       
       // Clear drawings for new slide
       clearCanvas();
@@ -587,47 +624,62 @@ const totalSlides = slideHeadings.length + 1;
     
     function handleKeyboard(e) {
       // Only handle if slide mode is active
-      if (!slideModeOverlay || slideModeOverlay.classList.contains('hidden')) return;
+      if (!slideModeOverlay || slideModeOverlay.classList.contains('hidden')) {
+        return;
+      }
       
       // Ignore if typing in input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      console.log('Key pressed:', e.key, 'Current slide:', currentSlide);
       
       switch (e.key) {
         case 'ArrowRight':
         case 'PageDown':
         case ' ':
           e.preventDefault();
+          e.stopPropagation();
+          console.log('Next triggered by keyboard');
           goToSlide(currentSlide + 1);
           break;
         case 'ArrowLeft':
         case 'PageUp':
           e.preventDefault();
+          e.stopPropagation();
+          console.log('Prev triggered by keyboard');
           goToSlide(currentSlide - 1);
           break;
         case 'Home':
           e.preventDefault();
+          e.stopPropagation();
           goToSlide(0);
           break;
         case 'End':
           e.preventDefault();
+          e.stopPropagation();
           goToSlide(totalSlides - 1);
           break;
         case 'd':
         case 'D':
+          e.preventDefault();
           toggleDrawingMode();
           break;
         case 'l':
         case 'L':
+          e.preventDefault();
           togglePointerMode();
           break;
         case 'c':
         case 'C':
+          e.preventDefault();
           if (isDrawing) clearDrawings();
           break;
         case 'Escape':
+          e.preventDefault();
           toggleSlideMode();
           break;
         case '?':
+          e.preventDefault();
           toggleShortcutsHelp();
           break;
       }
