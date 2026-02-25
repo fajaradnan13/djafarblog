@@ -40,7 +40,7 @@ const { currentPage = 'home' } = Astro.props;
       <!-- Right Side Actions -->
       <div class="hidden md:flex items-center gap-4">
         <!-- Theme Toggle -->
-        <ThemeToggle client:load />
+        <ThemeToggle location="desktop" client:load />
 
         <!-- Search Button -->
         <button
@@ -93,7 +93,7 @@ const { currentPage = 'home' } = Astro.props;
       <!-- Theme Toggle in Mobile Menu -->
       <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-terminal-border">
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
-        <ThemeToggle client:load />
+        <ThemeToggle location="mobile" client:load />
       </div>
       
       <!-- Navigation Links -->
