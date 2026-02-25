@@ -18,7 +18,7 @@ const totalSlides = slideHeadings.length + 1;
 <button
   id="slide-mode-toggle"
   type="button"
-  class="fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
+  class="fixed bottom-6 right-24 z-40 p-4 rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
   aria-label="Toggle Slide Mode"
   title="Start Presentation (Press P)"
 >
@@ -238,460 +238,481 @@ const totalSlides = slideHeadings.length + 1;
 </style>
 
 <script>
-  // Get data from DOM
-  const overlay = document.getElementById('slide-mode-overlay');
-  const slideHeadings = JSON.parse(overlay?.dataset.slideHeadings || '[]');
-  const totalSlides = parseInt(overlay?.dataset.totalSlides || '1');
-  
-  let currentSlide = 0;
-  let isDrawing = false;
-  let isPointerMode = false;
-  let lastX = 0;
-  let lastY = 0;
-  let drawings = [];
-  let currentDrawing = null;
-  
-  // DOM Elements
-  const slideModeToggle = document.getElementById('slide-mode-toggle');
-  const slideModeOverlay = document.getElementById('slide-mode-overlay');
-  const slideClose = document.getElementById('slide-close');
-  const slidePrev = document.getElementById('slide-prev');
-  const slideNext = document.getElementById('slide-next');
-  const slideContainer = document.getElementById('slide-container');
-  const slideContent = document.getElementById('slide-content');
-  const slideTitle = document.getElementById('slide-title');
-  const slideProgress = document.getElementById('slide-progress');
-  const slideDots = document.getElementById('slide-dots');
-  const drawingCanvas = document.getElementById('drawing-canvas');
-  const drawingModeToggle = document.getElementById('drawing-mode-toggle');
-  const clearDrawingsBtn = document.getElementById('clear-drawings');
-  const pointerModeToggle = document.getElementById('pointer-mode-toggle');
-  
-  let ctx = null;
-  if (drawingCanvas) {
-    ctx = drawingCanvas.getContext('2d');
-  }
-  
-  // Initialize slide mode
-  function initSlideMode() {
-    if (!slideModeToggle || !slideModeOverlay) return;
+  // Wait for DOM to be ready
+  function init() {
+    // Get data from DOM
+    var overlay = document.getElementById('slide-mode-overlay');
+    var slideHeadings = [];
+    var totalSlides = 1;
     
-    slideModeToggle.addEventListener('click', toggleSlideMode);
-    slideClose?.addEventListener('click', toggleSlideMode);
-    slidePrev?.addEventListener('click', function() { goToSlide(currentSlide - 1); });
-    slideNext?.addEventListener('click', function() { goToSlide(currentSlide + 1); });
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', handleKeyboard);
-    
-    // Drawing functionality
-    setupDrawing();
-    
-    // Drawing mode toggle
-    drawingModeToggle?.addEventListener('click', toggleDrawingMode);
-    clearDrawingsBtn?.addEventListener('click', clearDrawings);
-    pointerModeToggle?.addEventListener('click', togglePointerMode);
-  }
-  
-  function toggleSlideMode() {
-    var isActive = slideModeOverlay?.classList.contains('hidden') === false;
-    
-    if (isActive) {
-      // Exit slide mode
-      slideModeOverlay?.classList.add('hidden');
-      document.body.classList.remove('slide-mode-active');
-      document.body.classList.remove('presentation-cursor');
-      document.body.classList.remove('drawing');
-    } else {
-      // Enter slide mode
-      slideModeOverlay?.classList.remove('hidden');
-      document.body.classList.add('slide-mode-active');
-      currentSlide = 0;
-      renderSlides();
-      renderDots();
-      updateSlideInfo();
-      resizeCanvas();
-    }
-  }
-  
-  function renderSlides() {
-    if (!slideContent) return;
-    
-    var articleContent = document.querySelector('article');
-    if (!articleContent) return;
-    
-    var slidesHTML = '';
-    
-    // Title Slide
-    var articleTitle = document.querySelector('h1')?.textContent || 'Presentation';
-    var articleDescription = document.querySelector('article p')?.textContent || '';
-    
-    slidesHTML += '<div class="slide active" data-slide="0">' +
-      '<div class="slide-content-wrapper text-center py-20">' +
-      '<h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-primary-500 to-cyan-500 bg-clip-text text-transparent">' + escapeHtml(articleTitle) + '</h1>' +
-      '<p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">' + escapeHtml(articleDescription) + '</p>' +
-      '<div class="mt-12 flex items-center justify-center gap-2 text-sm text-gray-500">' +
-      '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />' +
-      '</svg>' +
-      '<span>Press → or Space to start</span>' +
-      '</div>' +
-      '</div>' +
-      '</div>';
-    
-    // Content Slides
-    slideHeadings.forEach(function(heading, index) {
-      var element = document.getElementById(heading.slug);
-      if (!element) return;
-      
-      var contentHTML = '';
-      var nextElement = element.nextElementSibling;
-      
-      // Collect content until next h2/h3 heading
-      while (nextElement && ['H2', 'H3'].indexOf(nextElement.tagName) === -1) {
-        var clone = nextElement.cloneNode(true);
-        
-        // Handle code blocks
-        if (clone.tagName === 'PRE') {
-          contentHTML += '<pre>' + clone.innerHTML + '</pre>';
-        } else if (clone.tagName === 'IMG') {
-          contentHTML += '<img src="' + clone.src + '" alt="' + (clone.alt || '') + '" />';
-        } else {
-          contentHTML += clone.outerHTML;
-        }
-        
-        nextElement = nextElement.nextElementSibling;
+    if (overlay) {
+      try {
+        slideHeadings = JSON.parse(overlay.dataset.slideHeadings || '[]');
+        totalSlides = parseInt(overlay.dataset.totalSlides || '1');
+      } catch (e) {
+        console.error('Error parsing slide data:', e);
       }
+    }
+    
+    var currentSlide = 0;
+    var isDrawing = false;
+    var isPointerMode = false;
+    var lastX = 0;
+    var lastY = 0;
+    var drawings = [];
+    var currentDrawing = null;
+    
+    // DOM Elements
+    var slideModeToggle = document.getElementById('slide-mode-toggle');
+    var slideModeOverlay = document.getElementById('slide-mode-overlay');
+    var slideClose = document.getElementById('slide-close');
+    var slidePrev = document.getElementById('slide-prev');
+    var slideNext = document.getElementById('slide-next');
+    var slideContainer = document.getElementById('slide-container');
+    var slideContent = document.getElementById('slide-content');
+    var slideTitle = document.getElementById('slide-title');
+    var slideProgress = document.getElementById('slide-progress');
+    var slideDots = document.getElementById('slide-dots');
+    var drawingCanvas = document.getElementById('drawing-canvas');
+    var drawingModeToggle = document.getElementById('drawing-mode-toggle');
+    var clearDrawingsBtn = document.getElementById('clear-drawings');
+    var pointerModeToggle = document.getElementById('pointer-mode-toggle');
+    
+    var ctx = null;
+    if (drawingCanvas) {
+      ctx = drawingCanvas.getContext('2d');
+    }
+    
+    // Initialize slide mode
+    function initSlideMode() {
+      if (!slideModeToggle || !slideModeOverlay) return;
       
-      slidesHTML += '<div class="slide" data-slide="' + (index + 1) + '">' +
-        '<div class="slide-content-wrapper">' +
-        '<div class="slide-content">' +
-        '<h2 class="text-3xl font-bold mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">' + escapeHtml(heading.text) + '</h2>' +
-        '<div class="prose prose-lg dark:prose-invert max-w-none">' +
-        contentHTML +
-        '</div>' +
+      slideModeToggle.addEventListener('click', toggleSlideMode);
+      if (slideClose) slideClose.addEventListener('click', toggleSlideMode);
+      if (slidePrev) slidePrev.addEventListener('click', function() { goToSlide(currentSlide - 1); });
+      if (slideNext) slideNext.addEventListener('click', function() { goToSlide(currentSlide + 1); });
+      
+      // Keyboard shortcuts
+      document.addEventListener('keydown', handleKeyboard);
+      
+      // Drawing functionality
+      setupDrawing();
+      
+      // Drawing mode toggle
+      if (drawingModeToggle) drawingModeToggle.addEventListener('click', toggleDrawingMode);
+      if (clearDrawingsBtn) clearDrawingsBtn.addEventListener('click', clearDrawings);
+      if (pointerModeToggle) pointerModeToggle.addEventListener('click', togglePointerMode);
+    }
+    
+    function toggleSlideMode() {
+      var isActive = slideModeOverlay && slideModeOverlay.classList.contains('hidden') === false;
+      
+      if (isActive) {
+        // Exit slide mode
+        if (slideModeOverlay) slideModeOverlay.classList.add('hidden');
+        document.body.classList.remove('slide-mode-active');
+        document.body.classList.remove('presentation-cursor');
+        document.body.classList.remove('drawing');
+      } else {
+        // Enter slide mode
+        if (slideModeOverlay) slideModeOverlay.classList.remove('hidden');
+        document.body.classList.add('slide-mode-active');
+        currentSlide = 0;
+        renderSlides();
+        renderDots();
+        updateSlideInfo();
+        resizeCanvas();
+      }
+    }
+    
+    function renderSlides() {
+      if (!slideContent) return;
+      
+      var articleContent = document.querySelector('article');
+      if (!articleContent) return;
+      
+      var slidesHTML = '';
+      
+      // Title Slide
+      var articleTitle = document.querySelector('h1');
+      var articleDescription = document.querySelector('article p');
+      var titleText = articleTitle ? articleTitle.textContent : 'Presentation';
+      var descText = articleDescription ? articleDescription.textContent : '';
+      
+      slidesHTML += '<div class="slide active" data-slide="0">' +
+        '<div class="slide-content-wrapper text-center py-20">' +
+        '<h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-primary-500 to-cyan-500 bg-clip-text text-transparent">' + escapeHtml(titleText) + '</h1>' +
+        '<p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">' + escapeHtml(descText) + '</p>' +
+        '<div class="mt-12 flex items-center justify-center gap-2 text-sm text-gray-500">' +
+        '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />' +
+        '</svg>' +
+        '<span>Press → or Space to start</span>' +
         '</div>' +
         '</div>' +
         '</div>';
-    });
-    
-    slideContent.innerHTML = slidesHTML;
-  }
-  
-  function renderDots() {
-    if (!slideDots) return;
-    
-    var dotsHTML = slideHeadings.map(function(_, index) {
-      return '<div class="slide-dot ' + (index === 0 ? 'active' : '') + '" data-slide="' + index + '" title="Slide ' + (index + 1) + '"></div>';
-    }).join('');
-    
-    slideDots.innerHTML = dotsHTML;
-    
-    // Add click handlers
-    slideDots.querySelectorAll('.slide-dot').forEach(function(dot) {
-      dot.addEventListener('click', function() {
-        var slideIndex = parseInt(dot.getAttribute('data-slide') || '0');
-        goToSlide(slideIndex);
-      });
-    });
-  }
-  
-  function goToSlide(index) {
-    if (index < 0 || index >= totalSlides) return;
-    
-    var slides = slideContent?.querySelectorAll('.slide');
-    var dots = slideDots?.querySelectorAll('.slide-dot');
-    
-    if (!slides || !dots) return;
-    
-    // Hide current slide
-    if (slides[currentSlide]) slides[currentSlide].classList.remove('active');
-    if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
-    
-    // Show new slide
-    currentSlide = index;
-    if (slides[currentSlide]) slides[currentSlide].classList.add('active');
-    if (dots[currentSlide]) dots[currentSlide].classList.add('active');
-    
-    // Clear drawings for new slide
-    clearCanvas();
-    loadDrawingsForSlide(currentSlide);
-    
-    // Scroll to top
-    if (slideContainer) slideContainer.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    updateSlideInfo();
-  }
-  
-  function updateSlideInfo() {
-    if (slideProgress) {
-      slideProgress.textContent = 'Slide ' + (currentSlide + 1) + ' of ' + totalSlides;
-    }
-  }
-  
-  function handleKeyboard(e) {
-    // Only handle if slide mode is active
-    if (slideModeOverlay?.classList.contains('hidden')) return;
-    
-    // Ignore if typing in input
-    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-    
-    switch (e.key) {
-      case 'ArrowRight':
-      case 'PageDown':
-      case ' ':
-        e.preventDefault();
-        goToSlide(currentSlide + 1);
-        break;
-      case 'ArrowLeft':
-      case 'PageUp':
-        e.preventDefault();
-        goToSlide(currentSlide - 1);
-        break;
-      case 'Home':
-        e.preventDefault();
-        goToSlide(0);
-        break;
-      case 'End':
-        e.preventDefault();
-        goToSlide(totalSlides - 1);
-        break;
-      case 'd':
-      case 'D':
-        toggleDrawingMode();
-        break;
-      case 'l':
-      case 'L':
-        togglePointerMode();
-        break;
-      case 'c':
-      case 'C':
-        if (isDrawing) clearDrawings();
-        break;
-      case 'Escape':
-        toggleSlideMode();
-        break;
-      case '?':
-        toggleShortcutsHelp();
-        break;
-    }
-  }
-  
-  function setupDrawing() {
-    if (!drawingCanvas || !ctx) return;
-    
-    // Set canvas size
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
-    // Mouse events
-    drawingCanvas.addEventListener('mousedown', startDrawing);
-    drawingCanvas.addEventListener('mousemove', draw);
-    drawingCanvas.addEventListener('mouseup', stopDrawing);
-    drawingCanvas.addEventListener('mouseout', stopDrawing);
-    
-    // Touch events
-    drawingCanvas.addEventListener('touchstart', handleTouchStart);
-    drawingCanvas.addEventListener('touchmove', handleTouchMove);
-    drawingCanvas.addEventListener('touchend', stopDrawing);
-  }
-  
-  function resizeCanvas() {
-    if (!drawingCanvas || !ctx) return;
-    drawingCanvas.width = window.innerWidth;
-    drawingCanvas.height = window.innerHeight;
-  }
-  
-  function startDrawing(e) {
-    if (!isDrawing) return;
-    
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-    
-    currentDrawing = { paths: [] };
-    currentDrawing.paths.push({
-      points: [{ x: lastX, y: lastY }],
-      color: '#EF4444',
-      width: 3
-    });
-  }
-  
-  function draw(e) {
-    if (!isDrawing || !currentDrawing || !ctx) return;
-    
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-    
-    currentDrawing.paths[0].points.push({ x: e.offsetX, y: e.offsetY });
-    
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-  }
-  
-  function stopDrawing() {
-    if (!isDrawing || !currentDrawing) return;
-    
-    if (!drawings[currentSlide]) {
-      drawings[currentSlide] = { slide: currentSlide, paths: [] };
-    }
-    drawings[currentSlide].paths.push(...currentDrawing.paths);
-    currentDrawing = null;
-  }
-  
-  function handleTouchStart(e) {
-    if (!isDrawing || !drawingCanvas) return;
-    e.preventDefault();
-    var touch = e.touches[0];
-    var rect = drawingCanvas.getBoundingClientRect();
-    lastX = touch.clientX - rect.left;
-    lastY = touch.clientY - rect.top;
-    
-    currentDrawing = { paths: [] };
-    currentDrawing.paths.push({
-      points: [{ x: lastX, y: lastY }],
-      color: '#EF4444',
-      width: 3
-    });
-  }
-  
-  function handleTouchMove(e) {
-    if (!isDrawing || !currentDrawing || !ctx || !drawingCanvas) return;
-    e.preventDefault();
-    
-    var touch = e.touches[0];
-    var rect = drawingCanvas.getBoundingClientRect();
-    var x = touch.clientX - rect.left;
-    var y = touch.clientY - rect.top;
-    
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    
-    currentDrawing.paths[0].points.push({ x: x, y: y });
-    
-    lastX = x;
-    lastY = y;
-  }
-  
-  function toggleDrawingMode() {
-    isDrawing = !isDrawing;
-    isPointerMode = false;
-    
-    if (drawingCanvas) {
-      drawingCanvas.classList.toggle('drawing-active', isDrawing);
-    }
-    
-    document.body.classList.toggle('drawing', isDrawing);
-    document.body.classList.toggle('presentation-cursor', isDrawing || isPointerMode);
-    
-    if (drawingModeToggle) {
-      drawingModeToggle.classList.toggle('bg-white/30', isDrawing);
-    }
-    if (pointerModeToggle) {
-      pointerModeToggle.classList.remove('bg-white/30');
-    }
-  }
-  
-  function togglePointerMode() {
-    isPointerMode = !isPointerMode;
-    isDrawing = false;
-    
-    if (drawingCanvas) {
-      drawingCanvas.classList.remove('drawing-active');
-    }
-    
-    document.body.classList.toggle('presentation-cursor', isPointerMode);
-    document.body.classList.remove('drawing');
-    
-    if (pointerModeToggle) {
-      pointerModeToggle.classList.toggle('bg-white/30', isPointerMode);
-    }
-    if (drawingModeToggle) {
-      drawingModeToggle.classList.remove('bg-white/30');
-    }
-  }
-  
-  function clearDrawings() {
-    if (!ctx) return;
-    
-    drawings[currentSlide] = { slide: currentSlide, paths: [] };
-    clearCanvas();
-  }
-  
-  function clearCanvas() {
-    if (!ctx || !drawingCanvas) return;
-    ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-  }
-  
-  function loadDrawingsForSlide(slideIndex) {
-    if (!ctx || !drawings[slideIndex]) return;
-    
-    drawings[slideIndex].paths.forEach(function(path) {
-      if (path.points.length < 2) return;
       
-      ctx.strokeStyle = path.color;
-      ctx.lineWidth = path.width;
+      // Content Slides
+      slideHeadings.forEach(function(heading, index) {
+        var element = document.getElementById(heading.slug);
+        if (!element) return;
+        
+        var contentHTML = '';
+        var nextElement = element.nextElementSibling;
+        
+        // Collect content until next h2/h3 heading
+        while (nextElement && ['H2', 'H3'].indexOf(nextElement.tagName) === -1) {
+          var clone = nextElement.cloneNode(true);
+          
+          // Handle code blocks
+          if (clone.tagName === 'PRE') {
+            contentHTML += '<pre>' + clone.innerHTML + '</pre>';
+          } else if (clone.tagName === 'IMG') {
+            contentHTML += '<img src="' + clone.src + '" alt="' + (clone.alt || '') + '" />';
+          } else {
+            contentHTML += clone.outerHTML;
+          }
+          
+          nextElement = nextElement.nextElementSibling;
+        }
+        
+        slidesHTML += '<div class="slide" data-slide="' + (index + 1) + '">' +
+          '<div class="slide-content-wrapper">' +
+          '<div class="slide-content">' +
+          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">' + escapeHtml(heading.text) + '</h2>' +
+          '<div class="prose prose-lg dark:prose-invert max-w-none">' +
+          contentHTML +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+      });
+      
+      slideContent.innerHTML = slidesHTML;
+    }
+    
+    function renderDots() {
+      if (!slideDots) return;
+      
+      var dotsHTML = slideHeadings.map(function(_, index) {
+        return '<div class="slide-dot ' + (index === 0 ? 'active' : '') + '" data-slide="' + index + '" title="Slide ' + (index + 1) + '"></div>';
+      }).join('');
+      
+      slideDots.innerHTML = dotsHTML;
+      
+      // Add click handlers
+      slideDots.querySelectorAll('.slide-dot').forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          var slideIndex = parseInt(dot.getAttribute('data-slide') || '0');
+          goToSlide(slideIndex);
+        });
+      });
+    }
+    
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      
+      var slides = slideContent ? slideContent.querySelectorAll('.slide') : [];
+      var dots = slideDots ? slideDots.querySelectorAll('.slide-dot') : [];
+      
+      if (!slides || !dots) return;
+      
+      // Hide current slide
+      if (slides[currentSlide]) slides[currentSlide].classList.remove('active');
+      if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+      
+      // Show new slide
+      currentSlide = index;
+      if (slides[currentSlide]) slides[currentSlide].classList.add('active');
+      if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+      
+      // Clear drawings for new slide
+      clearCanvas();
+      loadDrawingsForSlide(currentSlide);
+      
+      // Scroll to top
+      if (slideContainer) slideContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      updateSlideInfo();
+    }
+    
+    function updateSlideInfo() {
+      if (slideProgress) {
+        slideProgress.textContent = 'Slide ' + (currentSlide + 1) + ' of ' + totalSlides;
+      }
+    }
+    
+    function handleKeyboard(e) {
+      // Only handle if slide mode is active
+      if (!slideModeOverlay || slideModeOverlay.classList.contains('hidden')) return;
+      
+      // Ignore if typing in input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+        case ' ':
+          e.preventDefault();
+          goToSlide(currentSlide + 1);
+          break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          goToSlide(currentSlide - 1);
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToSlide(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToSlide(totalSlides - 1);
+          break;
+        case 'd':
+        case 'D':
+          toggleDrawingMode();
+          break;
+        case 'l':
+        case 'L':
+          togglePointerMode();
+          break;
+        case 'c':
+        case 'C':
+          if (isDrawing) clearDrawings();
+          break;
+        case 'Escape':
+          toggleSlideMode();
+          break;
+        case '?':
+          toggleShortcutsHelp();
+          break;
+      }
+    }
+    
+    function setupDrawing() {
+      if (!drawingCanvas || !ctx) return;
+      
+      // Set canvas size
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      
+      // Mouse events
+      drawingCanvas.addEventListener('mousedown', startDrawing);
+      drawingCanvas.addEventListener('mousemove', draw);
+      drawingCanvas.addEventListener('mouseup', stopDrawing);
+      drawingCanvas.addEventListener('mouseout', stopDrawing);
+      
+      // Touch events
+      drawingCanvas.addEventListener('touchstart', handleTouchStart);
+      drawingCanvas.addEventListener('touchmove', handleTouchMove);
+      drawingCanvas.addEventListener('touchend', stopDrawing);
+    }
+    
+    function resizeCanvas() {
+      if (!drawingCanvas || !ctx) return;
+      drawingCanvas.width = window.innerWidth;
+      drawingCanvas.height = window.innerHeight;
+    }
+    
+    function startDrawing(e) {
+      if (!isDrawing) return;
+      
+      lastX = e.offsetX;
+      lastY = e.offsetY;
+      
+      currentDrawing = { paths: [] };
+      currentDrawing.paths.push({
+        points: [{ x: lastX, y: lastY }],
+        color: '#EF4444',
+        width: 3
+      });
+    }
+    
+    function draw(e) {
+      if (!isDrawing || !currentDrawing || !ctx) return;
+      
+      ctx.strokeStyle = '#EF4444';
+      ctx.lineWidth = 3;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       
       ctx.beginPath();
-      ctx.moveTo(path.points[0].x, path.points[0].y);
-      
-      for (var i = 1; i < path.points.length; i++) {
-        ctx.lineTo(path.points[i].x, path.points[i].y);
-      }
-      
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.offsetX, e.offsetY);
       ctx.stroke();
-    });
-  }
-  
-  function toggleShortcutsHelp() {
-    var helpEl = document.querySelector('.shortcuts-help');
-    
-    if (helpEl) {
-      helpEl.remove();
-      return;
+      
+      currentDrawing.paths[0].points.push({ x: e.offsetX, y: e.offsetY });
+      
+      lastX = e.offsetX;
+      lastY = e.offsetY;
     }
     
-    helpEl = document.createElement('div');
-    helpEl.className = 'shortcuts-help visible';
-    helpEl.innerHTML = '<div class="font-semibold mb-2">Keyboard Shortcuts</div>' +
-      '<div>→ / Space : Next slide</div>' +
-      '<div>← : Previous slide</div>' +
-      '<div>D : Toggle drawing</div>' +
-      '<div>L : Toggle pointer</div>' +
-      '<div>C : Clear drawings</div>' +
-      '<div>Esc : Exit</div>';
-    
-    document.body.appendChild(helpEl);
-    
-    setTimeout(function() {
-      if (helpEl) {
-        helpEl.classList.remove('visible');
-        setTimeout(function() { if (helpEl) helpEl.remove(); }, 300);
+    function stopDrawing() {
+      if (!isDrawing || !currentDrawing) return;
+      
+      if (!drawings[currentSlide]) {
+        drawings[currentSlide] = { slide: currentSlide, paths: [] };
       }
-    }, 5000);
+      drawings[currentSlide].paths.push(...currentDrawing.paths);
+      currentDrawing = null;
+    }
+    
+    function handleTouchStart(e) {
+      if (!isDrawing || !drawingCanvas) return;
+      e.preventDefault();
+      var touch = e.touches[0];
+      var rect = drawingCanvas.getBoundingClientRect();
+      lastX = touch.clientX - rect.left;
+      lastY = touch.clientY - rect.top;
+      
+      currentDrawing = { paths: [] };
+      currentDrawing.paths.push({
+        points: [{ x: lastX, y: lastY }],
+        color: '#EF4444',
+        width: 3
+      });
+    }
+    
+    function handleTouchMove(e) {
+      if (!isDrawing || !currentDrawing || !ctx || !drawingCanvas) return;
+      e.preventDefault();
+      
+      var touch = e.touches[0];
+      var rect = drawingCanvas.getBoundingClientRect();
+      var x = touch.clientX - rect.left;
+      var y = touch.clientY - rect.top;
+      
+      ctx.strokeStyle = '#EF4444';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      
+      currentDrawing.paths[0].points.push({ x: x, y: y });
+      
+      lastX = x;
+      lastY = y;
+    }
+    
+    function toggleDrawingMode() {
+      isDrawing = !isDrawing;
+      isPointerMode = false;
+      
+      if (drawingCanvas) {
+        drawingCanvas.classList.toggle('drawing-active', isDrawing);
+      }
+      
+      document.body.classList.toggle('drawing', isDrawing);
+      document.body.classList.toggle('presentation-cursor', isDrawing || isPointerMode);
+      
+      if (drawingModeToggle) {
+        drawingModeToggle.classList.toggle('bg-white/30', isDrawing);
+      }
+      if (pointerModeToggle) {
+        pointerModeToggle.classList.remove('bg-white/30');
+      }
+    }
+    
+    function togglePointerMode() {
+      isPointerMode = !isPointerMode;
+      isDrawing = false;
+      
+      if (drawingCanvas) {
+        drawingCanvas.classList.remove('drawing-active');
+      }
+      
+      document.body.classList.toggle('presentation-cursor', isPointerMode);
+      document.body.classList.remove('drawing');
+      
+      if (pointerModeToggle) {
+        pointerModeToggle.classList.toggle('bg-white/30', isPointerMode);
+      }
+      if (drawingModeToggle) {
+        drawingModeToggle.classList.remove('bg-white/30');
+      }
+    }
+    
+    function clearDrawings() {
+      if (!ctx) return;
+      
+      drawings[currentSlide] = { slide: currentSlide, paths: [] };
+      clearCanvas();
+    }
+    
+    function clearCanvas() {
+      if (!ctx || !drawingCanvas) return;
+      ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+    }
+    
+    function loadDrawingsForSlide(slideIndex) {
+      if (!ctx || !drawings[slideIndex]) return;
+      
+      drawings[slideIndex].paths.forEach(function(path) {
+        if (path.points.length < 2) return;
+        
+        ctx.strokeStyle = path.color;
+        ctx.lineWidth = path.width;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(path.points[0].x, path.points[0].y);
+        
+        for (var i = 1; i < path.points.length; i++) {
+          ctx.lineTo(path.points[i].x, path.points[i].y);
+        }
+        
+        ctx.stroke();
+      });
+    }
+    
+    function toggleShortcutsHelp() {
+      var helpEl = document.querySelector('.shortcuts-help');
+      
+      if (helpEl) {
+        helpEl.remove();
+        return;
+      }
+      
+      helpEl = document.createElement('div');
+      helpEl.className = 'shortcuts-help visible';
+      helpEl.innerHTML = '<div class="font-semibold mb-2">Keyboard Shortcuts</div>' +
+        '<div>→ / Space : Next slide</div>' +
+        '<div>← : Previous slide</div>' +
+        '<div>D : Toggle drawing</div>' +
+        '<div>L : Toggle pointer</div>' +
+        '<div>C : Clear drawings</div>' +
+        '<div>Esc : Exit</div>';
+      
+      document.body.appendChild(helpEl);
+      
+      setTimeout(function() {
+        if (helpEl) {
+          helpEl.classList.remove('visible');
+          setTimeout(function() { if (helpEl) helpEl.remove(); }, 300);
+        }
+      }, 5000);
+    }
+    
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Initialize on load
+    initSlideMode();
   }
   
-  function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  // Run after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-  
-  // Initialize on load
-  initSlideMode();
 </script>
