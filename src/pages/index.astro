@@ -31,45 +31,67 @@ const otherPosts = recentPosts.slice(1);
     <section class="relative py-20 lg:py-32 flex items-center justify-center overflow-hidden">
         <!-- Background Effects -->
         <div class="absolute inset-0 bg-gradient-to-b from-primary-500/5 via-transparent to-transparent"></div>
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-float-slow"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-float-slow" style="animation-delay: -4s"></div>
         
         <!-- Grid Pattern -->
-        <div class="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:64px_64px] animate-scroll-grid"></div>
         
         <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-dark-800 dark:bg-dark-800 border border-terminal-border dark:border-terminal-border mb-8 animate-fade-in">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                <span class="text-sm text-gray-400 dark:text-gray-400 font-mono">Infrastruktur • SOC • Teknologi Umum</span>
-            </div>
+            <!-- Article Slider -->
+            <div class="relative w-full max-w-4xl mx-auto mb-16" id="hero-slider">
+                <!-- Slides Container -->
+                <div class="overflow-hidden rounded-2xl bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm border border-gray-200 dark:border-terminal-border shadow-2xl">
+                    <div class="flex transition-transform duration-500 ease-in-out" id="slider-track">
+                        {posts.slice(0, 5).map((post, index) => (
+                            <div class="w-full flex-shrink-0 relative group">
+                                <a href={`/blog/${post.slug}/`} class="block p-8 md:p-12 text-left">
+                                    <div class="flex items-center gap-3 mb-6">
+                                        <span class="tag bg-primary-500 text-white border-none">{post.data.category || 'Article'}</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                                            {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                year: 'numeric'
+                                            })}
+                                        </span>
+                                    </div>
+                                    <h2 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
+                                        {post.data.title}
+                                    </h2>
+                                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8 line-clamp-2 max-w-2xl">
+                                        {post.data.description}
+                                    </p>
+                                    <div class="inline-flex items-center text-primary-600 dark:text-primary-400 font-semibold group-hover:text-primary-500 dark:group-hover:text-primary-300 transition-colors">
+                                        Baca Artikel
+                                        <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
+                                    </div>
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-            <!-- Main Heading -->
-            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-slide-up">
-                Teknologi <br />
-                <span class="gradient-text">Newbie</span>
-            </h1>
+                <!-- Navigation Controls -->
+                <div class="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-6 z-20">
+                    <button id="slider-prev" class="w-12 h-12 rounded-full bg-white dark:bg-dark-800 border border-gray-200 dark:border-terminal-border text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-white hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/20 flex items-center justify-center transition-all shadow-lg focus:outline-none" aria-label="Previous slide">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                </div>
+                <div class="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-6 z-20">
+                    <button id="slider-next" class="w-12 h-12 rounded-full bg-white dark:bg-dark-800 border border-gray-200 dark:border-terminal-border text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-white hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/20 flex items-center justify-center transition-all shadow-lg focus:outline-none" aria-label="Next slide">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
 
-            <!-- Subtitle -->
-            <p class="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed animate-slide-up" style="animation-delay: 0.1s">
-                Eksplorasi wawasan, panduan praktis, dan catatan belajar seputar Infrastruktur IT, 
-                Security Operations Center (SOC), dan tren teknologi umum.
-            </p>
-            
-            <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s">
-                <a href="/blog" class="btn-primary group">
-                    Eksplorasi Artikel
-                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                </a>
-                <a href="/projects" class="btn-secondary">
-                    Lihat Proyek
-                </a>
+                <!-- Pagination Dots -->
+                <div class="flex justify-center gap-2 mt-8" id="slider-dots">
+                    {posts.slice(0, 5).map((_, i) => (
+                        <button class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 dark:hover:bg-primary-400 transition-all focus:outline-none" data-index={i} aria-label={`Go to slide ${i + 1}`}></button>
+                    ))}
+                </div>
             </div>
             
             <!-- Stats -->
@@ -279,3 +301,74 @@ const otherPosts = recentPosts.slice(1);
         </div>
     </section>
 </Layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const track = document.getElementById('slider-track');
+        const slides = track ? track.children : [];
+        const dots = document.querySelectorAll('#slider-dots button');
+        const prevBtn = document.getElementById('slider-prev');
+        const nextBtn = document.getElementById('slider-next');
+        
+        if (track && slides.length > 0) {
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+            let interval;
+
+            function updateSlider() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                dots.forEach((dot, index) => {
+                    if (index === currentIndex) {
+                        dot.classList.add('bg-primary-500', 'w-8');
+                        dot.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'w-2.5');
+                    } else {
+                        dot.classList.remove('bg-primary-500', 'w-8');
+                        dot.classList.add('bg-gray-300', 'dark:bg-gray-600', 'w-2.5');
+                    }
+                });
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlider();
+            }
+
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlider();
+            }
+
+            function resetInterval() {
+                clearInterval(interval);
+                interval = setInterval(nextSlide, 5000);
+            }
+
+            nextBtn?.addEventListener('click', () => {
+                nextSlide();
+                resetInterval();
+            });
+
+            prevBtn?.addEventListener('click', () => {
+                prevSlide();
+                resetInterval();
+            });
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateSlider();
+                    resetInterval();
+                });
+            });
+
+            // Initialize
+            updateSlider();
+            resetInterval();
+
+            // Pause on hover
+            const slider = document.getElementById('hero-slider');
+            slider?.addEventListener('mouseenter', () => clearInterval(interval));
+            slider?.addEventListener('mouseleave', () => resetInterval());
+        }
+    });
+</script>
