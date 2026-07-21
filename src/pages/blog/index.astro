@@ -74,7 +74,12 @@ function calculateReadTime(body) {
             const bgGradient = getGradient(post.data.category);
             
             return (
-              <article class="group relative overflow-hidden rounded-[2rem] bg-dark-800/40 backdrop-blur-xl border border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 flex flex-col">
+              <article 
+                class="group relative overflow-hidden rounded-[2rem] bg-dark-800/40 backdrop-blur-xl border border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 flex flex-col"
+                data-title={post.data.title.toLowerCase()}
+                data-description={post.data.description.toLowerCase()}
+                data-category={(post.data.category || '').toLowerCase()}
+              >
                 <div class={`h-48 w-full bg-gradient-to-br ${bgGradient} relative overflow-hidden`}>
                     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30 mix-blend-overlay"></div>
                     <div class="absolute inset-0 bg-dark-900/20 group-hover:bg-transparent transition-colors duration-500"></div>
@@ -165,12 +170,12 @@ function calculateReadTime(body) {
     const articles = articlesGrid?.querySelectorAll('article');
 
     articles?.forEach((article) => {
-      const title = article.querySelector('h2')?.textContent.toLowerCase() || '';
-      const description = article.querySelector('p')?.textContent.toLowerCase() || '';
-      const category = article.querySelector('.tag')?.textContent.toLowerCase() || '';
+      const title = article.getAttribute('data-title') || '';
+      const description = article.getAttribute('data-description') || '';
+      const category = article.getAttribute('data-category') || '';
 
       const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
-      const matchesCategory = !selectedCategory || category.includes(selectedCategory);
+      const matchesCategory = !selectedCategory || category === selectedCategory.toLowerCase();
 
       if (matchesSearch && matchesCategory) {
         article.removeAttribute('hidden');

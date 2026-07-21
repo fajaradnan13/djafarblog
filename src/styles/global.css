@@ -127,22 +127,41 @@
   }
 
   .nav-link {
-    @apply text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200;
-    @apply relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5;
-    @apply after:bg-primary-500 after:transition-all after:duration-300;
-    @apply hover:after:w-full;
+    @apply px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-all duration-300 rounded-full z-10;
+    @apply relative;
+  }
+
+  .nav-link::before {
+    content: '';
+    @apply absolute inset-0 bg-primary-500/10 scale-0 rounded-full transition-transform duration-300 origin-center -z-10;
+  }
+
+  .nav-link:hover::before {
+    @apply scale-100;
   }
 
   .dark .nav-link {
-    @apply text-gray-400 hover:text-gray-100;
+    @apply text-gray-300 hover:text-white;
+  }
+
+  .dark .nav-link::before {
+    @apply bg-primary-500/20;
   }
 
   .nav-link.active {
-    @apply text-primary-600 after:w-full;
+    @apply text-primary-600;
+  }
+
+  .nav-link.active::before {
+    @apply scale-100 bg-primary-500/10;
   }
 
   .dark .nav-link.active {
     @apply text-primary-400;
+  }
+
+  .dark .nav-link.active::before {
+    @apply bg-primary-500/20;
   }
 
   .gradient-text {
