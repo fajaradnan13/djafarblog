@@ -21,7 +21,7 @@ const {
   tags = [],
 } = Astro.props;
 
-const siteUrl = 'https://djafar.blog';
+const siteUrl = 'https://teknologinewbie.pages.dev';
 const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 ---
 
@@ -29,7 +29,7 @@ const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
-<meta name="author" content="Fajar Adnan" />
+<meta name="author" content="Teknologi Newbie" />
 <meta name="generator" content={Astro.generator} />
 <meta name="theme-color" content="#0a0a0a" />
 <meta name="color-scheme" content="dark" />
@@ -43,7 +43,7 @@ const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={fullImage} />
-<meta property="og:site_name" content="DJAFAR.BLOG" />
+<meta property="og:site_name" content="Teknologi Newbie" />
 <meta property="og:locale" content="en_US" />
 
 <!-- Twitter -->
@@ -52,8 +52,8 @@ const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={fullImage} />
-<meta property="twitter:creator" content="@fajaradnan13" />
-<meta property="twitter:site" content="@fajaradnan13" />
+<meta property="twitter:creator" content="@teknologinewbie" />
+<meta property="twitter:site" content="@teknologinewbie" />
 
 <!-- Article Meta Tags -->
 {type === 'article' && publishedTime && (

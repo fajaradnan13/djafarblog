@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://djafarblog.pages.dev/',
+  site: 'https://teknologinewbie.pages.dev/',
   output: 'static',
   integrations: [
     tailwind({

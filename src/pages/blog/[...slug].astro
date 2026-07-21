@@ -75,12 +75,12 @@ while ((match = headingRegex.exec(post.body)) !== null) {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <!-- Main Content -->
         <div class="lg:col-span-8 xl:col-span-9">
-          <!-- Back Button -->
+            <!-- Back Button -->
           <a href="/blog" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors mb-8 group">
             <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Articles
+            Kembali ke Daftar Artikel
           </a>
           
           <!-- Article Header -->
@@ -121,11 +121,11 @@ while ((match = headingRegex.exec(post.body)) !== null) {
             <div class="flex items-center gap-6 mt-8 pt-8 border-t border-gray-200 dark:border-terminal-border">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-cyan-400 flex items-center justify-center">
-                  <span class="text-dark-900 font-bold text-sm">FA</span>
+                  <span class="text-dark-900 font-bold text-sm">TN</span>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">Fajar Adnan</div>
-                  <div class="text-xs text-gray-600 dark:text-gray-400">Security Researcher</div>
+                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">Teknologi Newbie</div>
+                  <div class="text-xs text-gray-600 dark:text-gray-400">Tech & Security Enthusiast</div>
                 </div>
               </div>
               <div class="h-8 w-px bg-gray-200 dark:bg-terminal-border"></div>
@@ -182,7 +182,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
           <!-- Share Section -->
           <div class="mt-10 pt-8 border-t border-gray-200 dark:border-terminal-border">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
-              Share this article
+              Bagikan tutorial ini
             </h3>
             <div class="flex gap-3">
               <a
@@ -235,7 +235,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 pt-10 border-t border-gray-200 dark:border-terminal-border">
               {prevPost && (
                 <a href={`/blog/${prevPost.slug}/`} class="card p-5 group">
-                  <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">← Previous</div>
+                  <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">← Artikel Sebelumnya</div>
                   <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
                     {prevPost.data.title}
                   </h4>
@@ -250,7 +250,7 @@ while ((match = headingRegex.exec(post.body)) !== null) {
               )}
               {nextPost && (
                 <a href={`/blog/${nextPost.slug}/`} class="card p-5 group md:ml-auto">
-                  <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 text-right">Next →</div>
+                  <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 text-right">Artikel Selanjutnya →</div>
                   <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
                     {nextPost.data.title}
                   </h4>

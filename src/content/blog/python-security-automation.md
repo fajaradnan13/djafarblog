@@ -64,7 +64,7 @@ Port scanning adalah teknik dasar untuk menemukan service yang berjalan di sebua
 #!/usr/bin/env python3
 """
 Simple Port Scanner
-Author: Fajar Adnan
+Author: Teknologi Newbie
 Description: Basic port scanner untuk security assessment
 """
 

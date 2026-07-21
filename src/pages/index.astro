@@ -16,17 +16,19 @@ try {
     console.error("Failed to load blog collection:", error);
 }
 
-const recentPosts = posts.slice(0, 3);
+const recentPosts = posts.slice(0, 7);
+const featuredPost = recentPosts[0];
+const otherPosts = recentPosts.slice(1);
 ---
 
 <Layout
-    title="Security Researcher & Developer"
-    description="Sharing knowledge about cybersecurity, programming, and open-source technologies. Tutorials, security research, and technical deep-dives."
-    type="profile"
+    title="Belajar Teknologi untuk Pemula"
+    description="Tutorial, panduan, dan artikel seputar teknologi, programming, dan keamanan siber yang disajikan khusus untuk pemula."
+    type="website"
     currentPage="home"
 >
     <!-- Hero Section -->
-    <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+    <section class="relative py-20 lg:py-32 flex items-center justify-center overflow-hidden">
         <!-- Background Effects -->
         <div class="absolute inset-0 bg-gradient-to-b from-primary-500/5 via-transparent to-transparent"></div>
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
@@ -42,31 +44,31 @@ const recentPosts = posts.slice(0, 3);
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <span class="text-sm text-gray-400 dark:text-gray-400 font-mono">Available for security research & development</span>
+                <span class="text-sm text-gray-400 dark:text-gray-400 font-mono">Infrastruktur • SOC • Teknologi Umum</span>
             </div>
 
             <!-- Main Heading -->
             <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 mb-6 animate-slide-up">
-                Security Researcher <br />
-                <span class="gradient-text">& Developer</span>
+                Teknologi <br />
+                <span class="gradient-text">Newbie</span>
             </h1>
 
             <!-- Subtitle -->
             <p class="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed animate-slide-up" style="animation-delay: 0.1s">
-                Exploring the intersection of cybersecurity, open-source software, 
-                and modern development practices. Building secure systems and sharing knowledge.
+                Eksplorasi wawasan, panduan praktis, dan catatan belajar seputar Infrastruktur IT, 
+                Security Operations Center (SOC), dan tren teknologi umum.
             </p>
             
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s">
                 <a href="/blog" class="btn-primary group">
-                    Read Articles
+                    Eksplorasi Artikel
                     <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                 </a>
                 <a href="/projects" class="btn-secondary">
-                    View Projects
+                    Lihat Proyek
                 </a>
             </div>
             
@@ -74,15 +76,15 @@ const recentPosts = posts.slice(0, 3);
             <div class="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-gray-200 dark:border-terminal-border animate-fade-in" style="animation-delay: 0.3s">
                 <div>
                     <div class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{posts.length}+</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-500">Articles Published</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-500">Artikel & Panduan</div>
                 </div>
                 <div>
                     <div class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">5+</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-500">Open Source Projects</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-500">Kategori Topik</div>
                 </div>
                 <div>
                     <div class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">100%</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-500">Security Focused</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-500">Fokus Teknologi</div>
                 </div>
             </div>
         </div>
@@ -93,11 +95,11 @@ const recentPosts = posts.slice(0, 3);
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between mb-12">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Featured Articles</h2>
-                    <p class="text-gray-600 dark:text-gray-400">Latest insights and tutorials</p>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Artikel Terbaru</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Tulisan dan wawasan teknis terbaru</p>
                 </div>
                 <a href="/blog" class="hidden sm:flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 font-medium transition-colors">
-                    View all articles
+                    Lihat semua artikel
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
@@ -105,10 +107,41 @@ const recentPosts = posts.slice(0, 3);
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recentPosts.map((post) => (
+                <!-- Featured Article -->
+                {featuredPost && (
+                    <article class="card group md:col-span-2 lg:col-span-2">
+                        <a href={`/blog/${featuredPost.slug}/`} class="block p-6 sm:p-8 flex flex-col justify-center h-full">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="tag">{featuredPost.data.category || 'Article'}</span>
+                                <span class="text-xs text-gray-500 font-mono">
+                                    {new Date(featuredPost.data.pubDate).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                    })}
+                                </span>
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                {featuredPost.data.title}
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-base leading-relaxed mb-6 line-clamp-3">
+                                {featuredPost.data.description}
+                            </p>
+                            {featuredPost.data.tags && featuredPost.data.tags.length > 0 && (
+                                <div class="flex flex-wrap gap-2">
+                                    {featuredPost.data.tags.slice(0, 4).map((tag) => (
+                                        <span class="text-xs text-gray-500 dark:text-gray-500 font-mono">#{tag}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </a>
+                    </article>
+                )}
+
+                <!-- Other Recent Articles -->
+                {otherPosts.map((post) => (
                     <article class="card group">
                         <a href={`/blog/${post.slug}/`} class="block p-6">
-                            <!-- Category -->
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="tag">{post.data.category || 'Article'}</span>
                                 <span class="text-xs text-gray-500 font-mono">
@@ -119,18 +152,12 @@ const recentPosts = posts.slice(0, 3);
                                     })}
                                 </span>
                             </div>
-                            
-                            <!-- Title -->
                             <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
                                 {post.data.title}
                             </h3>
-                            
-                            <!-- Description -->
                             <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
                                 {post.data.description}
                             </p>
-                            
-                            <!-- Tags -->
                             {post.data.tags && post.data.tags.length > 0 && (
                                 <div class="flex flex-wrap gap-2 mt-4">
                                     {post.data.tags.slice(0, 3).map((tag) => (
@@ -145,7 +172,7 @@ const recentPosts = posts.slice(0, 3);
             
             <div class="mt-8 text-center sm:hidden">
                 <a href="/blog" class="btn-secondary inline-flex items-center gap-2">
-                    View all articles
+                    Lihat semua artikel
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
@@ -158,8 +185,8 @@ const recentPosts = posts.slice(0, 3);
     <section class="py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Topics I Cover</h2>
-                <p class="text-gray-600 dark:text-gray-400">Deep dives into various areas of technology and security</p>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Topik Pembahasan</h2>
+                <p class="text-gray-600 dark:text-gray-400">Eksplorasi mendalam ke berbagai area teknologi dan keamanan siber</p>
             </div>
             
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -233,20 +260,20 @@ const recentPosts = posts.slice(0, 3);
     </section>
 
     <!-- Newsletter CTA -->
-    <section class="py-20 bg-gray-50 dark:bg-dark-800/50">
+    <section class="py-20 bg-gray-50 dark:bg-dark-800/50 border-t border-gray-200 dark:border-terminal-border">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Stay Updated</h2>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Berlangganan Newsletter</h2>
             <p class="text-gray-600 dark:text-gray-400 mb-8">
-                Get notified when new articles are published. No spam, unsubscribe anytime.
+                Dapatkan pemberitahuan saat artikel terbaru diterbitkan. Tanpa spam.
             </p>
             <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Masukkan email Anda"
                     class="flex-1 px-4 py-3 bg-white dark:bg-dark-700 border border-gray-300 dark:border-terminal-border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 <button class="btn-primary whitespace-nowrap">
-                    Subscribe
+                    Berlangganan
                 </button>
             </div>
         </div>

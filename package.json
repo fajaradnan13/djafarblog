@@ -1,9 +1,9 @@
 {
-  "name": "djafarblog",
+  "name": "teknologinewbie",
   "type": "module",
   "version": "2.0.0",
   "description": "Modern tech blog built with Astro, TailwindCSS, and TinaCMS",
-  "author": "Fajar Adnan",
+  "author": "Teknologi Newbie",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

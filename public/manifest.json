@@ -1,7 +1,7 @@
 {
-  "name": "DJAFAR.BLOG",
-  "short_name": "DJAFAR",
-  "description": "Security Researcher & Developer Blog",
+  "name": "Teknologi Newbie",
+  "short_name": "Teknologi",
+  "description": "Blog tutorial teknologi dan programming untuk pemula",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
