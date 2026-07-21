@@ -159,17 +159,17 @@ const otherPosts = recentPosts.slice(1);
                         <>
                             {/* Featured Article (Large Bento Box) */}
                             {featuredPost && (
-                                <article class="group relative overflow-hidden rounded-[2rem] bg-dark-800/40 backdrop-blur-xl border border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 md:col-span-2 lg:col-span-2 flex flex-col justify-end min-h-[400px]">
+                                <article class="group relative overflow-hidden rounded-[2rem] bg-white/40 dark:bg-dark-800/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 md:col-span-2 lg:col-span-2 flex flex-col justify-end min-h-[400px]">
                                     <!-- Full background cover for featured -->
                                     <div class={`absolute inset-0 bg-gradient-to-br ${getGradient(featuredPost.data.category)} opacity-40 group-hover:opacity-50 transition-opacity duration-500`}>
                                         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30 mix-blend-overlay"></div>
                                     </div>
                                     <!-- Dark gradient overlay for text readability -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent"></div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-white via-white/80 dark:from-dark-900 dark:via-dark-900/80 to-transparent"></div>
                                     
                                     <a href={`/blog/${featuredPost.slug}/`} class="relative z-10 block p-8 sm:p-12">
                                         <div class="flex items-center gap-4 mb-6">
-                                            <span class="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider border border-white/20 shadow-xl">
+                                            <span class="px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-md text-gray-900 dark:text-white text-xs font-bold uppercase tracking-wider border border-black/10 dark:border-white/20 shadow-xl">
                                                 {featuredPost.data.category || 'Article'}
                                             </span>
                                             <div class="flex items-center text-gray-300 text-sm font-mono">
@@ -177,13 +177,13 @@ const otherPosts = recentPosts.slice(1);
                                                 {new Date(featuredPost.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </div>
                                         </div>
-                                        <h3 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 group-hover:text-primary-300 transition-colors leading-tight">
+                                        <h3 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-300 transition-colors leading-tight">
                                             {featuredPost.data.title}
                                         </h3>
-                                        <p class="text-gray-300 text-lg leading-relaxed mb-8 line-clamp-2 max-w-2xl">
+                                        <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-8 line-clamp-2 max-w-2xl">
                                             {featuredPost.data.description}
                                         </p>
-                                        <div class="inline-flex items-center text-primary-400 font-semibold group-hover:text-primary-300 transition-colors">
+                                        <div class="inline-flex items-center text-primary-600 dark:text-primary-400 font-semibold group-hover:text-primary-500 dark:group-hover:text-primary-300 transition-colors">
                                             Baca Selengkapnya
                                             <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -195,14 +195,14 @@ const otherPosts = recentPosts.slice(1);
 
                             <!-- Other Recent Articles (Standard Bento Boxes) -->
                             {otherPosts.slice(0, 4).map((post) => (
-                                <article class="group relative overflow-hidden rounded-[2rem] bg-dark-800/40 backdrop-blur-xl border border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 flex flex-col">
+                                <article class="group relative overflow-hidden rounded-[2rem] bg-white/40 dark:bg-dark-800/40 backdrop-blur-xl border border-gray-200 dark:border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 flex flex-col">
                                     <!-- Top visual cover -->
                                     <div class={`h-48 w-full bg-gradient-to-br ${getGradient(post.data.category)} relative overflow-hidden`}>
                                         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30 mix-blend-overlay"></div>
                                         <div class="absolute inset-0 bg-dark-900/20 group-hover:bg-transparent transition-colors duration-500"></div>
                                     </div>
                                     
-                                    <a href={`/blog/${post.slug}/`} class="flex flex-col flex-grow p-6 sm:p-8 relative z-10 bg-gradient-to-b from-dark-800/50 to-dark-900/80">
+                                    <a href={`/blog/${post.slug}/`} class="flex flex-col flex-grow p-6 sm:p-8 relative z-10 bg-gradient-to-b from-white/50 to-white/80 dark:from-dark-800/50 dark:to-dark-900/80">
                                         <div class="flex items-center justify-between mb-6">
                                             <span class="px-3 py-1 rounded-full bg-primary-500/20 text-primary-400 text-xs font-bold uppercase tracking-wider border border-primary-500/30">
                                                 {post.data.category || 'Article'}
@@ -212,10 +212,10 @@ const otherPosts = recentPosts.slice(1);
                                                 {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                             </div>
                                         </div>
-                                        <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-primary-400 transition-colors line-clamp-2 leading-snug">
+                                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2 leading-snug">
                                             {post.data.title}
                                         </h3>
-                                        <p class="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow">
+                                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow">
                                             {post.data.description}
                                         </p>
                                         <div class="inline-flex items-center text-primary-500 text-sm font-semibold group-hover:text-primary-400 transition-colors mt-auto">

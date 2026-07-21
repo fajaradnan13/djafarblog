@@ -18,7 +18,7 @@ const totalSlides = slideHeadings.length + 1;
 <button
   id="slide-mode-toggle"
   type="button"
-  class="fixed bottom-6 right-24 z-40 p-4 rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
+  class="fixed bottom-6 left-6 z-40 p-4 rounded-full bg-gradient-to-r from-primary-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
   aria-label="Toggle Slide Mode"
   title="Start Presentation (Press P)"
 >
@@ -519,45 +519,59 @@ const totalSlides = slideHeadings.length + 1;
         '</div>' +
         '</div>';
       
-      // Content Slides - get content from DOM based on heading slugs
-      slideHeadings.forEach(function(heading, index) {
-        // Clean slug the same way as in the page
-        var cleanSlug = heading.slug.replace(/^-+|-+$/g, '');
-        var element = document.getElementById(cleanSlug);
+      // Helper to escape HTML if not defined
+      var escapeHtmlStr = function(str) {
+        return String(str).replace(/[&<>'"]/g, function(tag) {
+          var charsToReplace = {
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+          };
+          return charsToReplace[tag] || tag;
+        });
+      };
+
+      // Content Slides - robust container parsing
+      var proseContainer = document.querySelector('.prose-custom') || document.querySelector('article');
+      if (proseContainer) {
+        var children = Array.from(proseContainer.children);
+        var currentSectionHTML = '';
+        var currentHeadingText = '';
+        var slideIndex = 1;
         
-        if (!element) {
-          console.warn('Element not found for slug:', cleanSlug, 'Original heading:', heading.text);
-          // Fallback: try to find by text content
-          var allHeadings = document.querySelectorAll('h2, h3');
-          allHeadings.forEach(function(h) {
-            if (h.textContent === heading.text) {
-              element = h;
-              console.log('Found element by text match:', element.id);
+        children.forEach(function(child) {
+          if (isHeading(child)) {
+            // Push previous section if it has content
+            if (currentHeadingText || currentSectionHTML.trim()) {
+               slidesHTML += '<div class="slide" data-slide="' + slideIndex + '">' +
+                '<div class="slide-content-wrapper">' +
+                (currentHeadingText ? '<h2 class="text-3xl font-bold mb-6 pb-4 border-b-2 border-primary-500/30">' + escapeHtmlStr(currentHeadingText) + '</h2>' : '') +
+                '<div class="slide-section">' +
+                currentSectionHTML +
+                '</div>' +
+                '</div>' +
+                '</div>';
+               slideIndex++;
             }
-          });
+            // Start new section
+            currentHeadingText = child.textContent;
+            currentSectionHTML = '';
+          } else {
+            // Append content
+            currentSectionHTML += child.outerHTML || child.textContent;
+          }
+        });
+        
+        // Push the last section
+        if (currentHeadingText || currentSectionHTML.trim()) {
+           slidesHTML += '<div class="slide" data-slide="' + slideIndex + '">' +
+            '<div class="slide-content-wrapper">' +
+            (currentHeadingText ? '<h2 class="text-3xl font-bold mb-6 pb-4 border-b-2 border-primary-500/30">' + escapeHtmlStr(currentHeadingText) + '</h2>' : '') +
+            '<div class="slide-section">' +
+            currentSectionHTML +
+            '</div>' +
+            '</div>' +
+            '</div>';
         }
-        
-        if (!element) return;
-        
-        // Get all content until next heading
-        var contentHTML = '';
-        var sibling = element.nextElementSibling;
-        
-        while (sibling && !isHeading(sibling)) {
-          var clone = sibling.cloneNode(true);
-          contentHTML += clone.outerHTML;
-          sibling = sibling.nextElementSibling;
-        }
-        
-        slidesHTML += '<div class="slide" data-slide="' + (index + 1) + '">' +
-          '<div class="slide-content-wrapper">' +
-          '<h2 class="text-3xl font-bold mb-6 pb-4 border-b-2 border-primary-500/30">' + escapeHtml(heading.text) + '</h2>' +
-          '<div class="slide-section">' +
-          contentHTML +
-          '</div>' +
-          '</div>' +
-          '</div>';
-      });
+      }
       
       slideContent.innerHTML = slidesHTML;
       console.log('Slides rendered:', slideContent.querySelectorAll('.slide').length, 'slides');
