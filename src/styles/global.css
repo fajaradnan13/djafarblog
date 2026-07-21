@@ -111,15 +111,19 @@
   }
 
   .card {
-    @apply bg-white border border-gray-200 rounded-xl transition-all duration-300;
+    @apply bg-white/80 backdrop-blur-xl border border-gray-200 rounded-[2rem] transition-all duration-500 overflow-hidden relative;
   }
 
   .dark .card {
-    @apply bg-dark-800 border border-terminal-border;
+    @apply bg-dark-800/40 border-white/10;
   }
 
   .card:hover {
-    @apply border-primary-500/50 shadow-lg shadow-primary-500/10;
+    @apply -translate-y-2 border-primary-500/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+  }
+  
+  .dark .card:hover {
+    @apply shadow-primary-500/20;
   }
 
   .nav-link {

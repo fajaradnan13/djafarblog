@@ -37,65 +37,76 @@ const otherPosts = recentPosts.slice(1);
         <!-- Grid Pattern -->
         <div class="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:64px_64px] animate-scroll-grid"></div>
         
-        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="relative z-10 w-full max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Article Slider -->
-            <div class="relative w-full max-w-4xl mx-auto mb-16" id="hero-slider">
+            <div class="relative w-full mx-auto mb-16 group" id="hero-slider">
                 <!-- Slides Container -->
-                <div class="overflow-hidden rounded-2xl bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm border border-gray-200 dark:border-terminal-border shadow-2xl">
-                    <div class="flex transition-transform duration-500 ease-in-out" id="slider-track">
-                        {posts.slice(0, 5).map((post, index) => (
-                            <div class="w-full flex-shrink-0 relative group">
-                                <a href={`/blog/${post.slug}/`} class="block p-8 md:p-12 text-left">
-                                    <div class="flex items-center gap-3 mb-6">
-                                        <span class="tag bg-primary-500 text-white border-none">{post.data.category || 'Article'}</span>
-                                        <span class="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                                            {new Date(post.data.pubDate).toLocaleDateString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric'
-                                            })}
-                                        </span>
-                                    </div>
-                                    <h2 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
-                                        {post.data.title}
-                                    </h2>
-                                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8 line-clamp-2 max-w-2xl">
-                                        {post.data.description}
-                                    </p>
-                                    <div class="inline-flex items-center text-primary-600 dark:text-primary-400 font-semibold group-hover:text-primary-500 dark:group-hover:text-primary-300 transition-colors">
-                                        Baca Artikel
-                                        <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                        </svg>
-                                    </div>
-                                </a>
-                            </div>
+                <div class="overflow-hidden rounded-3xl bg-dark-900 shadow-2xl relative border border-terminal-border">
+                    <div class="flex transition-transform duration-700 ease-out h-[500px] md:h-[600px]" id="slider-track">
+                        {posts.slice(0, 5).map((post, index) => {
+                            const gradients = [
+                                'from-primary-900/40 to-dark-900',
+                                'from-purple-900/40 to-dark-900',
+                                'from-emerald-900/40 to-dark-900',
+                                'from-rose-900/40 to-dark-900',
+                                'from-cyan-900/40 to-dark-900'
+                            ];
+                            const bgGradient = gradients[index % gradients.length];
+                            
+                            return (
+                                <div class={`w-full h-full flex-shrink-0 relative flex items-center bg-gradient-to-br ${bgGradient}`}>
+                                    <a href={`/blog/${post.slug}/`} class="block w-full p-8 md:p-16 lg:p-24 text-left z-10">
+                                        <div class="flex items-center gap-3 mb-6 animate-slide-up">
+                                            <span class="tag bg-primary-500 text-white border-none uppercase tracking-wider text-xs px-4 py-1.5">{post.data.category || 'Article'}</span>
+                                            <span class="text-sm text-gray-300 font-mono bg-dark-800/50 px-3 py-1 rounded-full backdrop-blur-sm border border-terminal-border">
+                                                {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </span>
+                                        </div>
+                                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 hover:text-primary-400 transition-colors line-clamp-2 max-w-4xl animate-slide-up" style="animation-delay: 0.1s">
+                                            {post.data.title}
+                                        </h2>
+                                        <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-10 line-clamp-2 max-w-3xl animate-slide-up" style="animation-delay: 0.2s">
+                                            {post.data.description}
+                                        </p>
+                                        <div class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-lg font-semibold transition-all animate-slide-up" style="animation-delay: 0.3s">
+                                            Baca Artikel
+                                            <svg class="w-5 h-5 ml-2 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    <!-- Navigation Controls (Inside slider) -->
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 md:pl-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                        <button id="slider-prev" class="w-12 h-12 rounded-full bg-dark-900/60 backdrop-blur-md border border-terminal-border text-white hover:bg-primary-500/80 hover:border-primary-400 flex items-center justify-center transition-all shadow-lg focus:outline-none" aria-label="Previous slide">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 md:pr-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                        <button id="slider-next" class="w-12 h-12 rounded-full bg-dark-900/60 backdrop-blur-md border border-terminal-border text-white hover:bg-primary-500/80 hover:border-primary-400 flex items-center justify-center transition-all shadow-lg focus:outline-none" aria-label="Next slide">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                    </div>
+
+                    <!-- Pagination Dots -->
+                    <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20" id="slider-dots">
+                        {posts.slice(0, 5).map((_, i) => (
+                            <button class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-all focus:outline-none backdrop-blur-sm" data-index={i} aria-label={`Go to slide ${i + 1}`}></button>
                         ))}
                     </div>
-                </div>
-
-                <!-- Navigation Controls -->
-                <div class="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-6 z-20">
-                    <button id="slider-prev" class="w-12 h-12 rounded-full bg-white dark:bg-dark-800 border border-gray-200 dark:border-terminal-border text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-white hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/20 flex items-center justify-center transition-all shadow-lg focus:outline-none" aria-label="Previous slide">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                    </button>
-                </div>
-                <div class="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-6 z-20">
-                    <button id="slider-next" class="w-12 h-12 rounded-full bg-white dark:bg-dark-800 border border-gray-200 dark:border-terminal-border text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-white hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/20 flex items-center justify-center transition-all shadow-lg focus:outline-none" aria-label="Next slide">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                    </button>
-                </div>
-
-                <!-- Pagination Dots -->
-                <div class="flex justify-center gap-2 mt-8" id="slider-dots">
-                    {posts.slice(0, 5).map((_, i) => (
-                        <button class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-primary-500 dark:hover:bg-primary-400 transition-all focus:outline-none" data-index={i} aria-label={`Go to slide ${i + 1}`}></button>
-                    ))}
                 </div>
             </div>
             
             <!-- Stats -->
-            <div class="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-gray-200 dark:border-terminal-border animate-fade-in" style="animation-delay: 0.3s">
+            <div class="grid grid-cols-3 gap-8 mt-12 pt-10 border-t border-gray-200 dark:border-terminal-border animate-fade-in text-center" style="animation-delay: 0.3s">
                 <div>
                     <div class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{posts.length}+</div>
                     <div class="text-sm text-gray-500 dark:text-gray-500">Artikel & Panduan</div>
@@ -113,92 +124,112 @@ const otherPosts = recentPosts.slice(1);
     </section>
 
     <!-- Featured Articles -->
-    <section class="py-20 bg-gray-50 dark:bg-dark-800/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-12">
+    <section class="py-24 relative">
+        <!-- Subtle background glow for the section -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-primary-500/5 blur-[120px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-16 gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Artikel Terbaru</h2>
-                    <p class="text-gray-600 dark:text-gray-400">Tulisan dan wawasan teknis terbaru</p>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Artikel <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-cyan-400">Terbaru</span></h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">Eksplorasi wawasan, tutorial teknis, dan catatan belajar terbaru yang dikurasi khusus untuk Anda.</p>
                 </div>
-                <a href="/blog" class="hidden sm:flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 font-medium transition-colors">
-                    Lihat semua artikel
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <a href="/blog" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-dark-800 border border-terminal-border text-primary-400 hover:text-primary-300 hover:bg-dark-700 hover:border-primary-500/50 transition-all group font-medium whitespace-nowrap">
+                    Lihat semua
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
             </div>
             
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Featured Article -->
-                {featuredPost && (
-                    <article class="card group md:col-span-2 lg:col-span-2">
-                        <a href={`/blog/${featuredPost.slug}/`} class="block p-6 sm:p-8 flex flex-col justify-center h-full">
-                            <div class="flex items-center gap-2 mb-4">
-                                <span class="tag">{featuredPost.data.category || 'Article'}</span>
-                                <span class="text-xs text-gray-500 font-mono">
-                                    {new Date(featuredPost.data.pubDate).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })}
-                                </span>
-                            </div>
-                            <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                {featuredPost.data.title}
-                            </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-base leading-relaxed mb-6 line-clamp-3">
-                                {featuredPost.data.description}
-                            </p>
-                            {featuredPost.data.tags && featuredPost.data.tags.length > 0 && (
-                                <div class="flex flex-wrap gap-2">
-                                    {featuredPost.data.tags.slice(0, 4).map((tag) => (
-                                        <span class="text-xs text-gray-500 dark:text-gray-500 font-mono">#{tag}</span>
-                                    ))}
-                                </div>
-                            )}
-                        </a>
-                    </article>
-                )}
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {(() => {
+                    const getGradient = (cat) => {
+                        const gradients = {
+                            'security': 'from-red-500/80 to-purple-600/80',
+                            'programming': 'from-blue-500/80 to-cyan-600/80',
+                            'devops': 'from-green-500/80 to-emerald-600/80',
+                            'open source': 'from-purple-500/80 to-pink-600/80',
+                            'tutorials': 'from-yellow-500/80 to-orange-600/80'
+                        };
+                        return gradients[cat?.toLowerCase()] || 'from-primary-500/80 to-blue-600/80';
+                    };
 
-                <!-- Other Recent Articles -->
-                {otherPosts.map((post) => (
-                    <article class="card group">
-                        <a href={`/blog/${post.slug}/`} class="block p-6">
-                            <div class="flex items-center gap-2 mb-4">
-                                <span class="tag">{post.data.category || 'Article'}</span>
-                                <span class="text-xs text-gray-500 font-mono">
-                                    {new Date(post.data.pubDate).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })}
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
-                                {post.data.title}
-                            </h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
-                                {post.data.description}
-                            </p>
-                            {post.data.tags && post.data.tags.length > 0 && (
-                                <div class="flex flex-wrap gap-2 mt-4">
-                                    {post.data.tags.slice(0, 3).map((tag) => (
-                                        <span class="text-xs text-gray-500 dark:text-gray-500 font-mono">#{tag}</span>
-                                    ))}
-                                </div>
+                    return (
+                        <>
+                            {/* Featured Article (Large Bento Box) */}
+                            {featuredPost && (
+                                <article class="group relative overflow-hidden rounded-[2rem] bg-dark-800/40 backdrop-blur-xl border border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 md:col-span-2 lg:col-span-2 flex flex-col justify-end min-h-[400px]">
+                                    <!-- Full background cover for featured -->
+                                    <div class={`absolute inset-0 bg-gradient-to-br ${getGradient(featuredPost.data.category)} opacity-40 group-hover:opacity-50 transition-opacity duration-500`}>
+                                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30 mix-blend-overlay"></div>
+                                    </div>
+                                    <!-- Dark gradient overlay for text readability -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent"></div>
+                                    
+                                    <a href={`/blog/${featuredPost.slug}/`} class="relative z-10 block p-8 sm:p-12">
+                                        <div class="flex items-center gap-4 mb-6">
+                                            <span class="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider border border-white/20 shadow-xl">
+                                                {featuredPost.data.category || 'Article'}
+                                            </span>
+                                            <div class="flex items-center text-gray-300 text-sm font-mono">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                {new Date(featuredPost.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </div>
+                                        </div>
+                                        <h3 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 group-hover:text-primary-300 transition-colors leading-tight">
+                                            {featuredPost.data.title}
+                                        </h3>
+                                        <p class="text-gray-300 text-lg leading-relaxed mb-8 line-clamp-2 max-w-2xl">
+                                            {featuredPost.data.description}
+                                        </p>
+                                        <div class="inline-flex items-center text-primary-400 font-semibold group-hover:text-primary-300 transition-colors">
+                                            Baca Selengkapnya
+                                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </article>
                             )}
-                        </a>
-                    </article>
-                ))}
-            </div>
-            
-            <div class="mt-8 text-center sm:hidden">
-                <a href="/blog" class="btn-secondary inline-flex items-center gap-2">
-                    Lihat semua artikel
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
+
+                            <!-- Other Recent Articles (Standard Bento Boxes) -->
+                            {otherPosts.slice(0, 4).map((post) => (
+                                <article class="group relative overflow-hidden rounded-[2rem] bg-dark-800/40 backdrop-blur-xl border border-white/10 hover:border-primary-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary-500/20 flex flex-col">
+                                    <!-- Top visual cover -->
+                                    <div class={`h-48 w-full bg-gradient-to-br ${getGradient(post.data.category)} relative overflow-hidden`}>
+                                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30 mix-blend-overlay"></div>
+                                        <div class="absolute inset-0 bg-dark-900/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                                    </div>
+                                    
+                                    <a href={`/blog/${post.slug}/`} class="flex flex-col flex-grow p-6 sm:p-8 relative z-10 bg-gradient-to-b from-dark-800/50 to-dark-900/80">
+                                        <div class="flex items-center justify-between mb-6">
+                                            <span class="px-3 py-1 rounded-full bg-primary-500/20 text-primary-400 text-xs font-bold uppercase tracking-wider border border-primary-500/30">
+                                                {post.data.category || 'Article'}
+                                            </span>
+                                            <div class="flex items-center text-gray-400 text-xs font-mono">
+                                                <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                            </div>
+                                        </div>
+                                        <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-primary-400 transition-colors line-clamp-2 leading-snug">
+                                            {post.data.title}
+                                        </h3>
+                                        <p class="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow">
+                                            {post.data.description}
+                                        </p>
+                                        <div class="inline-flex items-center text-primary-500 text-sm font-semibold group-hover:text-primary-400 transition-colors mt-auto">
+                                            Baca
+                                            <svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </article>
+                            ))}
+                        </>
+                    );
+                })()}
             </div>
         </div>
     </section>
@@ -282,7 +313,7 @@ const otherPosts = recentPosts.slice(1);
     </section>
 
     <!-- Newsletter CTA -->
-    <section class="py-20 bg-gray-50 dark:bg-dark-800/50 border-t border-gray-200 dark:border-terminal-border">
+    <section class="py-20 border-t border-white/5 relative">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Berlangganan Newsletter</h2>
             <p class="text-gray-600 dark:text-gray-400 mb-8">
@@ -319,11 +350,11 @@ const otherPosts = recentPosts.slice(1);
                 track.style.transform = `translateX(-${currentIndex * 100}%)`;
                 dots.forEach((dot, index) => {
                     if (index === currentIndex) {
-                        dot.classList.add('bg-primary-500', 'w-8');
-                        dot.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'w-2.5');
+                        dot.classList.add('bg-white', 'w-8');
+                        dot.classList.remove('bg-white/30', 'w-3');
                     } else {
-                        dot.classList.remove('bg-primary-500', 'w-8');
-                        dot.classList.add('bg-gray-300', 'dark:bg-gray-600', 'w-2.5');
+                        dot.classList.remove('bg-white', 'w-8');
+                        dot.classList.add('bg-white/30', 'w-3');
                     }
                 });
             }
