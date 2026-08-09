@@ -2,36 +2,35 @@
   "name": "teknologinewbie",
   "type": "module",
   "version": "2.0.0",
-  "description": "Modern tech blog built with Astro, TailwindCSS, and TinaCMS",
+  "description": "Modern tech blog built with Astro, TailwindCSS",
   "author": "Teknologi Newbie",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "build:tina": "tinacms build --skip-index && astro build",
+    "build:search": "node scripts/generate-search.js",
+    "build": "npm run build:search && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint . --ext .astro,.js,.ts",
     "lint:fix": "eslint . --ext .astro,.js,.ts --fix"
   },
   "dependencies": {
-    "astro": "^5.17.1",
-    "tinacms": "^3.5.0"
+    "astro": "^5.17.1"
   },
   "devDependencies": {
     "@astrojs/sitemap": "^3.2.0",
     "@astrojs/tailwind": "^5.1.4",
     "@tailwindcss/typography": "^0.5.19",
-    "@tinacms/cli": "^2.1.6",
     "@types/node": "^25.3.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "fast-glob": "^3.2.12",
+    "gray-matter": "^4.0.3"
   },
   "keywords": [
     "blog",
     "astro",
     "tailwindcss",
     "security",
-    "technology",
-    "tinacms"
+    "technology"
   ],
   "license": "MIT"
 }
