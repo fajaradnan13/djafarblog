@@ -1,0 +1,69 @@
+---
+import { settings } from "@/config/config.json";
+import DynamicIcon from "@/helpers/DynamicIcon";
+import dateFormat from "@/lib/utils/dateFormat";
+import { markdownify, slugify } from "@/lib/utils/textConverter";
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+const { post_folder } = settings;
+const { summary_length } = settings;
+
+type Props = CollectionEntry<"posts">;
+const { image, title, date, categories } = Astro.props.data;
+const { body, id } = Astro.props;
+---
+
+<div class="post">
+  <div class="relative">
+    {
+      image && (
+        <Image
+          class="rounded"
+          src={image}
+          alt={title || ""}
+          width={405}
+          height={208}
+          format="webp"
+          loading="lazy"
+        />
+      )
+    }
+
+    <ul class="absolute top-3 left-2 flex flex-wrap items-center">
+      {
+        categories?.map((tag) => (
+          <li class="m-2 inline-flex h-7 rounded-[35px] bg-primary px-3 text-white">
+            <a
+              aria-label="categories"
+              class="capitalize"
+              href={`/categories/${slugify(tag)}`}>
+              {tag}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <h3 class="h5 mb-2 mt-4">
+    <a
+      href={`/${post_folder}/${id}`}
+      class="block py-0.5 hover:text-primary dark:hover:text-darkmode-primary">
+      {title}
+    </a>
+  </h3>
+  <ul class="flex items-center space-x-4 mb-2">
+    <li class="inline-flex items-center font-secondary text-xs leading-3">
+      <DynamicIcon className="mr-1.5" icon="FaRegCalendar" />
+      {dateFormat(date!)}
+    </li>
+  </ul>
+  <p set:html={markdownify(body!.slice(0, summary_length))}></p>
+  <a
+    title={title}
+    aria-label={title}
+    class="btn btn-outline-primary mt-4"
+    href={`/${post_folder}/${id}`}>
+    <span class="sr-only">{title}</span>
+    Read More
+  </a>
+</div>
