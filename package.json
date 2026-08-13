@@ -8,6 +8,7 @@
     "dev": "npx @tinacms/cli@latest dev -c \"astro dev\"",
     "preview": "astro preview",
     "build": "npx @tinacms/cli@latest build && astro build",
+    "build:tina": "npm run build",
     "format": "prettier -w ./src",
     "generate-json": "node scripts/jsonGenerator.js",
     "remove-darkmode": "node scripts/removeDarkmode.js && yarn format",
