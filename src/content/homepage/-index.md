@@ -1,9 +1,9 @@
 ---
 banner:
   title: Welcome **!**
-  title_small: "to John Bravo's Blog"
-  content: Are Developer and recently started your own business Already made website to ensure presence wants to develop.
-  image_enable: true
+  title_small: "to Djafar Blog"
+  content: Blog seputar teknologi, web development, pemrograman, dan wawasan IT terkini.
+  image_enable: false
   image: /images/banner-author.png
   button:
     enable: true
