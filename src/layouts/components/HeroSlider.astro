@@ -1,0 +1,95 @@
+---
+import { Image } from "astro:assets";
+import dateFormat from "@/lib/utils/dateFormat";
+import DynamicIcon from "@/helpers/DynamicIcon";
+
+const { posts, post_folder } = Astro.props;
+---
+
+<div class="swiper hero-slider mb-12 rounded-lg overflow-hidden relative group">
+  <div class="swiper-wrapper">
+    {posts.map((post: any, index: number) => {
+      const { image, title, date, categories } = post.data;
+      return (
+        <div class="swiper-slide relative">
+          {image ? (
+            <Image
+              class="w-full h-[350px] md:h-[500px] object-cover"
+              src={image}
+              alt={title || "Post Image"}
+              width={1200}
+              height={500}
+              format="webp"
+              loading={index === 0 ? "eager" : "lazy"}
+            />
+          ) : (
+            <div class="w-full h-[350px] md:h-[500px] bg-gray-800"></div>
+          )}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
+            <div class="p-6 md:p-12 w-full max-w-4xl">
+              {categories && categories.length > 0 && (
+                <span class="bg-primary text-white text-xs uppercase px-3 py-1 rounded mb-4 inline-block font-semibold">
+                  {categories[0]}
+                </span>
+              )}
+              <h2 class="h3 md:h1 mb-4">
+                <a href={`/${post_folder}/${post.id}`} class="text-white hover:text-primary transition-colors">
+                  {title}
+                </a>
+              </h2>
+              <p class="inline-flex items-center font-medium text-gray-300">
+                <DynamicIcon className="mr-2" icon="FaRegCalendar" />
+                {dateFormat(date)}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+  
+  <div class="swiper-pagination"></div>
+  <div class="swiper-button-prev !text-white after:!text-3xl opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex drop-shadow-md"></div>
+  <div class="swiper-button-next !text-white after:!text-3xl opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex drop-shadow-md"></div>
+</div>
+
+<script>
+  import Swiper from 'swiper/bundle';
+  import 'swiper/css/bundle';
+  
+  document.addEventListener('astro:page-load', () => {
+    new Swiper('.hero-slider', {
+      loop: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+    });
+  });
+</script>
+
+<style is:global>
+  .hero-slider .swiper-pagination-bullet {
+    background: #ffffff;
+    opacity: 0.5;
+    width: 10px;
+    height: 10px;
+  }
+  .hero-slider .swiper-pagination-bullet-active {
+    background: #1E6250; /* Primary color */
+    opacity: 1;
+    width: 12px;
+    height: 12px;
+  }
+  .hero-slider {
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+  }
+</style>

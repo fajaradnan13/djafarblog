@@ -1,15 +1,15 @@
 {
   "site": {
-    "title": "Djafar Blog",
+    "title": "Teknologi Newbie",
     "base_url": "https://teknologi-newbie.my.id",
     "base_path": "/",
     "trailing_slash": false,
     "favicon": "/images/favicon.png",
-    "logo": "/images/logo.png",
-    "logo_darkmode": "/images/logo-darkmode.png",
+    "logo": "",
+    "logo_darkmode": "",
     "logo_width": "150",
     "logo_height": "39",
-    "logo_text": "DjafarBlog"
+    "logo_text": "Teknologi Newbie"
   },
 
   "settings": {

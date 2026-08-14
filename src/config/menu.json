@@ -16,21 +16,6 @@
     {
       "name": "Contact",
       "url": "/contact"
-    },
-    {
-      "name": "Pages",
-      "url": "",
-      "hasChildren": true,
-      "children": [
-        {
-          "name": "Elements",
-          "url": "/elements"
-        },
-        {
-          "name": "Categories",
-          "url": "/categories"
-        }
-      ]
     }
   ],
   "footer": [

@@ -1,6 +1,7 @@
 ---
 import Pagination from "@/components/Pagination.astro";
 import Post from "@/components/post.astro";
+import HeroSlider from "@/components/HeroSlider.astro";
 import { settings } from "@/config/config.json";
 import DynamicIcon from "@/helpers/DynamicIcon";
 import Base from "@/layouts/Base.astro";
@@ -27,54 +28,9 @@ const featuredPosts = posts.filter((post) => post.data.featured);
 ---
 
 <Base>
-  {/* Banner */}
-  <section class="section banner relative pb-0">
-    <Image
-      class="absolute bottom-0 left-0 z-[-1] w-full"
-      src={"/images/banner-bg-shape.png"}
-      width={1905}
-      height={351}
-      style={{ objectFit: "contain" }}
-      alt="banner-shape"
-      loading={"eager"}
-    />
-
+  <section class="section pt-14 pb-0">
     <div class="container">
-      <div
-        class="row flex-wrap-reverse items-center justify-center lg:flex-row">
-        <div
-          class={banner.image_enable
-            ? "mt-12 text-center lg:mt-0 lg:text-left lg:col-6"
-            : "mt-12 text-center lg:mt-0 lg:text-left lg:col-12"}>
-          <div class="banner-title">
-            <h1 set:html={markdownify(banner.title)}></h1>
-            <span set:html={markdownify(banner.title_small)}></span>
-          </div>
-          <p class="mt-4" set:html={markdownify(banner.content)}></p>
-          {
-            banner.button.enable && (
-              <a class="btn btn-primary lg:mb-0 my-6" href={banner.button.link}>
-                {banner.button.label}
-              </a>
-            )
-          }
-        </div>
-        {
-          banner.image_enable && (
-            <div class="col-9 lg:col-6">
-              <Image
-                class="mx-auto object-contain"
-                src={banner.image}
-                width={548}
-                height={443}
-                format="webp"
-                alt="Banner"
-                loading="eager"
-              />
-            </div>
-          )
-        }
-      </div>
+      <HeroSlider posts={sortedPost.slice(0, 3)} post_folder={post_folder} />
     </div>
   </section>
 
