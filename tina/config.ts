@@ -30,7 +30,7 @@ export default defineConfig({
         format: "md",
         ui: {
           router: ({ document }: { document: any }) => {
-            return `/posts/${document._sys.filename.toLowerCase()}`;
+            return `/posts/${document._sys.filename}`;
           },
         },
         fields: [
@@ -108,7 +108,7 @@ export default defineConfig({
         format: "md",
         ui: {
           router: ({ document }: { document: any }) => {
-            return `/${document._sys.filename.toLowerCase()}`;
+            return `/${document._sys.filename}`;
           },
         },
         fields: [
