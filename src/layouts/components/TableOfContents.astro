@@ -1,0 +1,66 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{filteredHeadings.length > 0 && (
+  <div class="toc-container mb-6 rounded-lg border border-border bg-theme-light p-6 shadow-sm dark:border-darkmode-border dark:bg-darkmode-theme-light">
+    <h3 class="h5 mb-4 flex items-center font-primary text-text-dark dark:text-darkmode-text-light">
+      <svg class="mr-2 h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+      </svg>
+      Daftar Isi
+    </h3>
+    <ul class="toc-list flex flex-col space-y-2 text-sm">
+      {filteredHeadings.map((heading) => (
+        <li class={`leading-snug ${heading.depth === 3 ? "ml-4" : ""}`}>
+          <a
+            href={`#${heading.slug}`}
+            class="toc-link block border-l-2 border-transparent py-1 pl-3 text-text transition-all hover:border-primary hover:text-primary dark:text-darkmode-text dark:hover:text-primary"
+            data-slug={heading.slug}
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let lastIntersecting = null;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            lastIntersecting = entry.target.getAttribute("id");
+          }
+        });
+        
+        if (lastIntersecting) {
+          document.querySelectorAll('.toc-link').forEach((link) => {
+            link.classList.remove('border-primary', 'text-primary', 'font-bold');
+            link.classList.add('border-transparent', 'text-text', 'dark:text-darkmode-text');
+          });
+          const activeLink = document.querySelector(`.toc-link[data-slug="${lastIntersecting}"]`);
+          if (activeLink) {
+            activeLink.classList.remove('border-transparent', 'text-text', 'dark:text-darkmode-text');
+            activeLink.classList.add('border-primary', 'text-primary', 'font-bold');
+          }
+        }
+      },
+      { rootMargin: "0px 0px -70% 0px", threshold: 1.0 }
+    );
+
+    document.querySelectorAll('article h2, article h3').forEach((section) => {
+      observer.observe(section);
+    });
+  });
+</script>

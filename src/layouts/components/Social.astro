@@ -16,18 +16,34 @@ export interface ISocial {
 
 <ul class={className}>
   {
-    source.map((social: ISocial) => (
+    source.map((social: ISocial) => {
+      const isYoutube = social.name.toLowerCase() === 'youtube';
+      return (
       <li>
-        <a
-          aria-label={social.name}
-          href={social.link}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          <span class="sr-only">{social.name}</span>
-          <DynamicIcon className="inline-block" icon={social.icon} />
-        </a>
+        {isYoutube ? (
+          <a
+            aria-label={social.name}
+            href={social.link}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            class="!inline-flex !items-center gap-2 !rounded-full !bg-[#ff0000] !px-6 !py-2 !text-white hover:!bg-red-700 hover:!-translate-y-1 transition-all !shadow-lg !font-bold !text-sm tracking-wide"
+            style="color: white !important;"
+          >
+            <DynamicIcon className="inline-block text-xl" icon={social.icon} />
+            <span class="inline-block">Subscribe ke YouTube Kami</span>
+          </a>
+        ) : (
+          <a
+            aria-label={social.name}
+            href={social.link}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            <span class="sr-only">{social.name}</span>
+            <DynamicIcon className="inline-block" icon={social.icon} />
+          </a>
+        )}
       </li>
-    ))
+    )})
   }
 </ul>

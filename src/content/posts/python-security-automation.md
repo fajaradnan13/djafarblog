@@ -6,6 +6,8 @@ categories: ["security"]
 featured: true
 draft: false
 image: "/images/post/post-1.png"
+series: "Tutorial Python Security"
+series_part: 1
 ---
 
 <!-- tags: python, security, automation, cybersecurity, tutorial, beginner -->

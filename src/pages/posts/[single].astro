@@ -1,6 +1,7 @@
 ---
 import InnerPagination from "@/components/InnerPagination.astro";
 import Post from "@/components/post.astro";
+import SlideView from "@/components/SlideView";
 import { disqus, settings } from "@/config/config.json";
 import Disqus from "@/helpers/Disqus";
 import DynamicIcon from "@/helpers/DynamicIcon";
@@ -32,13 +33,14 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { title, image, date, description, meta_title } = post.data;
-const { Content } = await render(post);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
 const categories = await getTaxonomy(post_folder, "categories");
 const postEntries = await getSinglePage("posts");
 const relatedPosts = similarItems(post, postEntries);
 ---
 
 <Base title={title} description={description} meta_title={meta_title}>
+  <div id="scroll-progress" class="fixed top-0 left-0 h-1 bg-primary z-50 w-0 transition-all duration-150"></div>
   <section class="section single-blog">
     <div class="container">
       <div class="row">
@@ -84,13 +86,20 @@ const relatedPosts = similarItems(post, postEntries);
               class="lg:text-[42px] mt-4 mb-2"
               set:text={markdownify(title ?? "")}
             ></h1>
-            <ul class="flex items-center space-x-4 mb-2">
+            <ul class="flex items-center space-x-4 mb-6">
               <li
                 class="inline-flex items-center font-secondary text-xs leading-3">
                 <DynamicIcon icon="FaRegCalendar" className="mr-1.5" />
                 {dateFormat(date!)}
               </li>
+              {remarkPluginFrontmatter?.minutesRead && (
+                <li class="inline-flex items-center font-secondary text-xs leading-3">
+                  <DynamicIcon icon="FaRegClock" className="mr-1.5" />
+                  {remarkPluginFrontmatter.minutesRead}
+                </li>
+              )}
             </ul>
+            
             <div class="content mb-16">
               <Content />
             </div>
@@ -102,6 +111,8 @@ const relatedPosts = similarItems(post, postEntries);
         </div>
         <Sidebar
           posts={postEntries.filter((singlePost) => singlePost.id !== post.id)}
+          headings={headings}
+          currentPost={post}
         />
       </div>
     </div>
@@ -120,4 +131,59 @@ const relatedPosts = similarItems(post, postEntries);
       </div>
     </div>
   </section>
+
+  <script>
+    document.addEventListener("astro:page-load", () => {
+      const progressBar = document.getElementById("scroll-progress");
+      if (progressBar) {
+        window.addEventListener("scroll", () => {
+          const scrollPx = document.documentElement.scrollTop;
+          const winHeightPx = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = `${(scrollPx / winHeightPx) * 100}%`;
+          progressBar.style.width = scrolled;
+        });
+      }
+    });
+
+    // Copy to clipboard functionality for code blocks
+    document.addEventListener("astro:page-load", () => {
+      const blocks = document.querySelectorAll("pre");
+      blocks.forEach((block) => {
+        // Prevent adding multiple buttons if page-load fires again
+        if (block.querySelector(".copy-code-btn")) return;
+
+        block.style.position = "relative";
+        
+        const button = document.createElement("button");
+        button.className = "copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white px-2 py-1 rounded text-xs transition-colors backdrop-blur-sm border border-gray-600/50 flex items-center gap-1 opacity-0 group-hover:opacity-100";
+        
+        // Use SVG for copy icon
+        button.innerHTML = `<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="14" width="14" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>`;
+        
+        // Add group class to pre to show button on hover
+        block.classList.add("group");
+
+        button.addEventListener("click", async () => {
+          const code = block.querySelector("code");
+          if (!code) return;
+          
+          try {
+            await navigator.clipboard.writeText(code.innerText);
+            button.innerHTML = `<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="14" width="14" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Copied!</span>`;
+            button.classList.add("text-green-400", "border-green-500/50");
+            
+            setTimeout(() => {
+              button.innerHTML = `<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="14" width="14" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>`;
+              button.classList.remove("text-green-400", "border-green-500/50");
+            }, 2000);
+          } catch (err) {
+            console.error("Failed to copy!", err);
+          }
+        });
+
+        block.appendChild(button);
+      });
+    });
+  </script>
+  <SlideView client:load />
 </Base>

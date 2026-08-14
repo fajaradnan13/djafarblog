@@ -82,6 +82,18 @@ export default defineConfig({
             label: "Draft",
           },
           {
+            type: "string",
+            name: "series",
+            label: "Series Name",
+            description: "If this post is part of a series, enter the series name here.",
+          },
+          {
+            type: "number",
+            name: "series_part",
+            label: "Series Part",
+            description: "The order number of this post in the series.",
+          },
+          {
             type: "rich-text",
             name: "body",
             label: "Body",

@@ -4,7 +4,7 @@
     "base_url": "https://teknologi-newbie.my.id",
     "base_path": "/",
     "trailing_slash": false,
-    "favicon": "/images/favicon.png",
+    "favicon": "/images/favicon.svg",
     "logo": "",
     "logo_darkmode": "",
     "logo_width": "150",

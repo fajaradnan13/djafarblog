@@ -10,15 +10,20 @@ import { sortByDate } from "@/lib/utils/sortFunctions";
 import { markdownify, slugify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
+import type { MarkdownHeading } from "astro";
+import TableOfContents from "@/layouts/components/TableOfContents.astro";
+import PostSeries from "@/layouts/components/PostSeries.astro";
 
 type Props = {
   posts: CollectionEntry<"posts">[];
   className?: string;
+  headings?: MarkdownHeading[];
+  currentPost?: CollectionEntry<"posts">;
 };
 
 const { post_folder } = settings;
 const { about, categories, featured_posts, newsletter } = widgets;
-const { posts, className } = Astro.props;
+const { posts, className, headings, currentPost } = Astro.props;
 const catagories = await getTaxonomy("posts", "categories");
 const featuredPosts: CollectionEntry<"posts">[] = sortByDate(posts).filter(
   (post) => post.data.featured,
@@ -30,6 +35,7 @@ const categoriesWithPostsCount = catagories.map((category) => {
   return {
     name: category,
     posts: filteredPosts.length,
+    recentPosts: sortByDate(filteredPosts).slice(0, 3),
   };
 });
 ---
@@ -59,6 +65,8 @@ const categoriesWithPostsCount = catagories.map((category) => {
     )
   }
 
+  {currentPost && <PostSeries currentPost={currentPost} />}
+
   {/* categories widget */}
   {
     categories.enable && (
@@ -69,35 +77,37 @@ const categoriesWithPostsCount = catagories.map((category) => {
         ></h4>
         <ul>
           {categoriesWithPostsCount.map((category, i) => (
-            <li
-              class={`relative mb-2 flex items-center justify-between pl-6 text-[16px] font-bold capitalize text-text-dark dark:text-darkmode-text-light ${
-                i !== catagories.length - 1 &&
-                "border-b border-border  dark:border-darkmode-border"
-              }`}
-            >
-              <svg
-                class="absolute left-0 top-2.5"
-                width="20px"
-                height="20px"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.7318 9.35984C12.0854 8.93556 12.7159 8.87824 13.1402 9.2318C13.5645 9.58537 13.6218 10.2159 13.2682 10.6402L8.26825 16.6402C7.91468 17.0645 7.28412 17.1218 6.85984 16.7682C6.43556 16.4147 6.37824 15.7841 6.7318 15.3598L11.7318 9.35984Z"
-                  fill="#2ba283"
-                />
-                <path
-                  d="M6.7318 4.64021C6.37824 4.21593 6.43556 3.58537 6.85984 3.2318C7.28412 2.87824 7.91468 2.93556 8.26825 3.35984L13.2682 9.35984C13.6218 9.78412 13.5645 10.4147 13.1402 10.7682C12.7159 11.1218 12.0854 11.0645 11.7318 10.6402L6.7318 4.64021Z"
-                  fill="#2ba283"
-                />
-              </svg>
-              <a class="py-2" href={`/categories/${slugify(category.name)}`}>
-                {slugify(category.name)}
-                <span class="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500">
-                  {category.posts}
-                </span>
-              </a>
+            <li class={`mb-2 ${i !== catagories.length - 1 ? "border-b border-border dark:border-darkmode-border" : ""}`}>
+              <details class="group">
+                <summary class="relative flex cursor-pointer items-center justify-between py-3 pl-6 text-[16px] font-bold capitalize text-text-dark dark:text-darkmode-text-light list-none hover:text-primary transition-colors">
+                  <svg class="absolute left-0 top-3.5 transition-transform group-open:rotate-90" width="20px" height="20px" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.7318 9.35984C12.0854 8.93556 12.7159 8.87824 13.1402 9.2318C13.5645 9.58537 13.6218 10.2159 13.2682 10.6402L8.26825 16.6402C7.91468 17.0645 7.28412 17.1218 6.85984 16.7682C6.43556 16.4147 6.37824 15.7841 6.7318 15.3598L11.7318 9.35984Z" fill="#2ba283"/>
+                    <path d="M6.7318 4.64021C6.37824 4.21593 6.43556 3.58537 6.85984 3.2318C7.28412 2.87824 7.91468 2.93556 8.26825 3.35984L13.2682 9.35984C13.6218 9.78412 13.5645 10.4147 13.1402 10.7682C12.7159 11.1218 12.0854 11.0645 11.7318 10.6402L6.7318 4.64021Z" fill="#2ba283"/>
+                  </svg>
+                  <span>{slugify(category.name)}</span>
+                  <span class="text-sm text-gray-500 font-medium">
+                    {category.posts}
+                  </span>
+                </summary>
+                
+                <div class="mt-1 mb-4 pl-6">
+                  <ul class="space-y-3">
+                    {category.recentPosts.map((post: any) => (
+                      <li class="relative pl-3 before:absolute before:left-0 before:top-2 before:h-1.5 before:w-1.5 before:rounded-full before:bg-primary/50 text-sm">
+                        <a href={`/${post_folder}/${post.id}`} class="text-text hover:text-primary dark:text-darkmode-text-light transition-colors line-clamp-2 leading-snug">
+                          {post.data.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <div class="mt-4">
+                    <a href={`/categories/${slugify(category.name)}`} class="text-xs font-semibold text-primary hover:underline flex items-center">
+                      Lihat semua artikel
+                      <DynamicIcon icon="FaArrowRight" className="ml-1 text-[10px]" />
+                    </a>
+                  </div>
+                </div>
+              </details>
             </li>
           ))}
         </ul>
@@ -205,6 +215,12 @@ const categoriesWithPostsCount = catagories.map((category) => {
       </div>
     )
   }
+
+  {headings && headings.length > 0 && (
+    <div class="sticky top-24 z-10 mt-6 hidden lg:block">
+      <TableOfContents headings={headings} />
+    </div>
+  )}
 </aside>
 
 <script>

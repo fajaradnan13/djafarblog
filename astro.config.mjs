@@ -2,6 +2,7 @@ import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import { remarkReadingTime } from "./scripts/readingTime.mjs";
 
 import { defineConfig, fontProviders, sharpImageService } from "astro/config";
 import config from "./src/config/config.json";
@@ -59,6 +60,7 @@ export default defineConfig({
     mdx(),
   ],
   markdown: {
+    remarkPlugins: [remarkReadingTime],
     shikiConfig: {
       theme: "one-dark-pro",
       wrap: true,

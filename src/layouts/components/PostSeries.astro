@@ -1,0 +1,61 @@
+---
+import { getSinglePage } from "@/lib/contentParser.astro";
+import type { CollectionEntry } from "astro:content";
+import { settings } from "@/config/config.json";
+import DynamicIcon from "@/helpers/DynamicIcon";
+
+interface Props {
+  currentPost: CollectionEntry<"posts">;
+}
+
+const { currentPost } = Astro.props;
+const seriesName = currentPost.data.series;
+const { post_folder } = settings;
+
+let seriesPosts: CollectionEntry<"posts">[] = [];
+
+if (seriesName) {
+  const allPosts = await getSinglePage("posts");
+  seriesPosts = allPosts
+    .filter((p: any) => p.data.series === seriesName && !p.data.draft)
+    .sort((a: any, b: any) => (a.data.series_part || 0) - (b.data.series_part || 0));
+}
+---
+
+{seriesPosts.length > 1 && (
+  <div class="mt-6 rounded-lg border border-border p-6 shadow-sm dark:border-darkmode-border bg-theme-light dark:bg-darkmode-theme-light">
+    <div class="flex items-center mb-6">
+      <DynamicIcon icon="FaRoute" className="text-primary text-xl mr-3" />
+      <h3 class="h5 font-primary m-0 text-text-dark dark:text-darkmode-text-light">Seri Artikel: {seriesName}</h3>
+    </div>
+    
+    <div class="relative border-l-2 border-border dark:border-darkmode-border ml-3 space-y-6">
+      {seriesPosts.map((post: any) => {
+        const isCurrent = post.id === currentPost.id;
+        return (
+          <div class="relative pl-6">
+            {/* Timeline Dot */}
+            <div class={`absolute -left-[9px] top-1.5 h-4 w-4 rounded-full border-2 border-theme-light dark:border-darkmode-theme-light ${isCurrent ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+            
+            <div class="flex flex-col">
+              <span class="text-xs font-bold text-primary mb-1">Bagian {post.data.series_part}</span>
+              {isCurrent ? (
+                <span class="font-bold text-text-dark dark:text-darkmode-text-light">
+                  {post.data.title} 
+                  <span class="ml-2 inline-block rounded bg-primary/10 px-2 py-0.5 text-[10px] text-primary">Sedang Dibaca</span>
+                </span>
+              ) : (
+                <a
+                  href={`/${post_folder}/${post.id}`}
+                  class="text-text hover:text-primary dark:text-darkmode-text dark:hover:text-primary transition-colors font-medium"
+                >
+                  {post.data.title}
+                </a>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}

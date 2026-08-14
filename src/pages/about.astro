@@ -4,79 +4,94 @@ import { markdownify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import { getEntry, render } from "astro:content";
+import DynamicIcon from "@/helpers/DynamicIcon";
 
 const about = (await getEntry("about", "-index")) as CollectionEntry<"about">;
 const { Content } = await render(about);
-const { title, image, education, experience, description, meta_title } =
-  about.data;
+const { title, image, experience, description, meta_title } = about.data;
 ---
 
 <Base title={title} meta_title={meta_title} description={description}>
-  <section class="section">
-    <div class="container text-center">
-      {
-        image && (
-          <div class="mb-8">
-            <Image
-              src={image}
-              width={1298}
-              height={616}
-              alt={title || ""}
-              class="rounded-lg"
-              format="webp"
-            />
-          </div>
-        )
-      }
-
-      <h1
-        class="h1 text-left lg:text-[55px] mt-12"
-        set:html={markdownify(title || "")}
-      ></h1>
-
-      <div class="content text-left">
-        <Content />
+  {/* Hero Background */}
+  <section class="relative overflow-hidden bg-gradient-to-br from-primary to-[#0f3b5c] py-24 dark:from-primary/20 dark:to-blue-900/20">
+    <div class="absolute inset-0 bg-[url('/images/map.png')] bg-cover bg-center opacity-10"></div>
+    <div class="container relative z-10">
+      <div class="row items-center justify-center text-center">
+        <div class="lg:col-8">
+          {image && image !== "" && (
+            <div class="mb-8 flex justify-center">
+              <div class="rounded-full border-4 border-white/20 p-2 shadow-2xl backdrop-blur-sm">
+                <Image
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt={title || ""}
+                  class="rounded-full object-cover"
+                  format="webp"
+                />
+              </div>
+            </div>
+          )}
+          <h1 class="text-4xl font-bold text-white lg:text-5xl mb-6 shadow-sm" set:html={markdownify(title || "")}></h1>
+          <p class="text-lg text-white/80 font-medium tracking-wide">IT Professional • Open Source Enthusiast • DevOps • Security</p>
+        </div>
       </div>
+    </div>
+    
+    {/* Decorative Bottom Wave/Divider (Optional, using SVG) */}
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+      <svg class="relative block w-full h-[40px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" class="fill-body dark:fill-darkmode-body"></path>
+      </svg>
+    </div>
+  </section>
 
-      <div class="row mt-24 text-left lg:flex-nowrap">
-        <div class="lg:col-6">
-          <div
-            class="rounded border border-border p-6 dark:border-darkmode-border">
-            <h2
-              class="section-title mb-12"
-              set:html={markdownify(education.title || "")}
-            ></h2>
-
-            <div class="row">
-              {
-                education.degrees.map((degree) => (
-                  <div class="mb-7 md:col-6">
-                    <h4 class="text-base lg:text-[25px]">
-                      {degree.university}
-                    </h4>
-                    <p class="mt-2">{degree.content}</p>
-                  </div>
-                ))
-              }
+  <section class="section pt-12">
+    <div class="container">
+      <div class="row justify-center">
+        {/* Main Content Card */}
+        <div class="lg:col-10">
+          <div class="rounded-2xl border border-border bg-theme-light p-8 shadow-xl dark:border-darkmode-border dark:bg-darkmode-theme-light md:p-12">
+            <div class="content prose-lg max-w-none text-text-dark dark:prose-invert dark:text-darkmode-text-light text-left">
+              <Content />
             </div>
           </div>
         </div>
-        <div class="experience mt-10 lg:mt-0 lg:col-6">
-          <div
-            class="rounded border border-border p-6 dark:border-darkmode-border">
-            <h2
-              class="section-title mb-12"
-              set:html={markdownify(experience.title || "")}
-            ></h2>
-            <ul class="row">
-              {
-                experience?.list?.map((item) => (
-                  <li class="mb-5 text-lg font-bold text-text-dark dark:text-darkmode-text-light lg:col-6">
-                    <span set:html={markdownify(item)}></span>
-                  </li>
-                ))
-              }
-            </ul>
+      </div>
+
+      {/* Expertise / Experience Section */}
+      <div class="row mt-24 justify-center">
+        <div class="lg:col-10">
+          <div class="mb-14 text-center">
+            <h2 class="text-3xl font-bold text-text-dark dark:text-darkmode-text-light" set:html={markdownify(experience.title || "Keahlian & Minat")}></h2>
+            <div class="mt-4 flex justify-center">
+              <div class="h-1.5 w-24 rounded-full bg-primary opacity-80"></div>
+            </div>
+          </div>
+          
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {experience?.list?.map((item: string, index: number) => {
+              // Assign a generic dynamic icon based on the text
+              let icon = "FaLaptopCode";
+              const lowerItem = item.toLowerCase();
+              if (lowerItem.includes("linux") || lowerItem.includes("server")) icon = "FaLinux";
+              else if (lowerItem.includes("devops") || lowerItem.includes("ci/cd") || lowerItem.includes("otomatis")) icon = "FaInfinity";
+              else if (lowerItem.includes("security") || lowerItem.includes("keamanan")) icon = "FaShield";
+              else if (lowerItem.includes("open source")) icon = "FaGithub";
+              else if (lowerItem.includes("programming") || lowerItem.includes("aplikasi")) icon = "FaCode";
+
+              return (
+                <div class="group relative overflow-hidden rounded-xl border border-border bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:border-darkmode-border dark:bg-darkmode-theme-light">
+                  <div class="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-[2]"></div>
+                  <div class="relative z-10">
+                    <div class="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <DynamicIcon icon={icon} className="text-3xl" />
+                    </div>
+                    <h3 class="text-[17px] font-bold leading-snug text-text-dark dark:text-darkmode-text-light" set:html={markdownify(item)}></h3>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

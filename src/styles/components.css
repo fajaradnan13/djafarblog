@@ -150,7 +150,7 @@
 
 /* socials */
 .socials {
-  @apply flex items-center justify-center space-x-3 lg:justify-start lg:border-x lg:border-border 2xl:space-x-4;
+  @apply flex items-center justify-center space-x-3 lg:justify-start 2xl:space-x-4 border-none;
   li {
     @apply inline-flex;
   }

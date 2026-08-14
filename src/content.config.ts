@@ -90,6 +90,8 @@ const postsCollection = defineCollection({
     categories: z.array(z.string()).optional(),
     featured: z.boolean().optional(),
     draft: z.boolean().optional(),
+    series: z.string().optional(),
+    series_part: z.number().optional(),
   }),
 });
 
