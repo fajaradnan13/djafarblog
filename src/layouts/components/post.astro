@@ -2,7 +2,7 @@
 import { settings } from "@/config/config.json";
 import DynamicIcon from "@/helpers/DynamicIcon";
 import dateFormat from "@/lib/utils/dateFormat";
-import { markdownify, slugify } from "@/lib/utils/textConverter";
+import { plainify, slugify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 const { post_folder } = settings;
@@ -29,7 +29,7 @@ const { body, id } = Astro.props;
       )
     }
 
-    <ul class="absolute top-3 left-2 flex flex-wrap items-center">
+    <ul class={`${image ? "absolute top-3 left-2" : "mb-4"} flex flex-wrap items-center`}>
       {
         categories?.map((tag) => (
           <li class="m-2 inline-flex h-7 rounded-[35px] bg-primary px-3 text-white">
@@ -57,7 +57,7 @@ const { body, id } = Astro.props;
       {dateFormat(date!)}
     </li>
   </ul>
-  <p set:html={markdownify(body!.slice(0, summary_length))}></p>
+  <p>{plainify(body!).slice(0, summary_length)}...</p>
   <a
     title={title}
     aria-label={title}
