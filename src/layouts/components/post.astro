@@ -57,7 +57,7 @@ const { body, id } = Astro.props;
       {dateFormat(date!)}
     </li>
   </ul>
-  <p>{plainify(body!).slice(0, summary_length)}...</p>
+  <p class="break-words">{plainify(body!).slice(0, summary_length)}...</p>
   <a
     title={title}
     aria-label={title}
