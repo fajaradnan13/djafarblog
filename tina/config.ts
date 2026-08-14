@@ -28,11 +28,6 @@ export default defineConfig({
         label: "Blog Posts",
         path: "src/content/posts",
         format: "md",
-        ui: {
-          router: ({ document }: { document: any }) => {
-            return `/posts/${document._sys.filename.toLowerCase()}`;
-          },
-        },
         fields: [
           {
             type: "string",
@@ -106,11 +101,6 @@ export default defineConfig({
         label: "Pages",
         path: "src/content/pages",
         format: "md",
-        ui: {
-          router: ({ document }: { document: any }) => {
-            return `/${document._sys.filename.toLowerCase()}`;
-          },
-        },
         fields: [
           {
             type: "string",
@@ -147,11 +137,6 @@ export default defineConfig({
         label: "About Page",
         path: "src/content/about",
         format: "md",
-        ui: {
-          router: () => {
-            return `/about`;
-          },
-        },
         fields: [
           {
             type: "string",
