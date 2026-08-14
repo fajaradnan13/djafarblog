@@ -9,13 +9,17 @@ categories:
 
 ## Jangan Begitu
 
+semasdkalskjdalksjdaskjdalsdas
 
-semasdkalskjdalksjdaskjdalsdasdasddasdasdhjahsjdahsdjasdhjahsgdjahsdjahdssdjahsdasd
+dasddasdasdhjahsjdahsdjasdhjah
+
+sgdjahsdjahdssdjahsdasd
 
 ### Ada 2
 
+namun bhsjdjakhskjdahsdjasdas
 
-namun bhsjdjakhskjdahsdjasdasdasdasdsadsssdasdasdasd
+dasdasdsadsssdasdasdasd
 
 asdasdasda
 
@@ -27,7 +31,7 @@ asdasdasd
 
 asdasda
 
-## contoh 
+## contoh
 
 ```bash
 sudo apt install openssl
