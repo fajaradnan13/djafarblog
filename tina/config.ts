@@ -1,5 +1,7 @@
 import { defineConfig } from "tinacms";
 
+// Force TinaCloud to re-index the schema
+
 const branch =
   process.env.CF_PAGES_BRANCH ||
   process.env.GITHUB_BRANCH ||
