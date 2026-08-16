@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import DynamicIcon from "@/helpers/DynamicIcon";
 
-type ThemeType = 'dark' | 'light' | 'sepia';
+type ThemeType = 'dark' | 'light' | 'midnight';
 
 const THEMES = {
   dark: {
@@ -13,26 +13,32 @@ const THEMES = {
     controlsText: "text-white hover:text-primary",
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-white",
     btnSecondary: "bg-gray-800 border-gray-700 hover:bg-gray-700 text-white",
+    pattern: { backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px)', backgroundSize: '24px 24px' }
   },
   light: {
-    bg: "bg-white",
+    bg: "bg-slate-50",
     text: "text-slate-900",
     prose: "prose-slate",
     isDarkClass: "",
     controlsWrapper: "bg-white/90 border-gray-200",
     controlsText: "text-slate-800 hover:text-primary",
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-slate-800",
-    btnSecondary: "bg-gray-100 border-gray-200 hover:bg-gray-200 text-slate-800",
+    btnSecondary: "bg-white border-gray-200 hover:bg-gray-100 text-slate-800",
+    pattern: { backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }
   },
-  sepia: {
-    bg: "bg-[#f4ecd8]",
-    text: "text-[#5b4636]",
-    prose: "prose-stone",
-    isDarkClass: "",
-    controlsWrapper: "bg-[#e8dec5]/90 border-[#d0c3a8]",
-    controlsText: "text-[#5b4636] hover:text-primary",
-    controlsDisabled: "disabled:opacity-30 disabled:hover:text-[#5b4636]",
-    btnSecondary: "bg-[#e8dec5] border-[#d0c3a8] hover:bg-[#d0c3a8] text-[#5b4636]",
+  midnight: {
+    bg: "bg-[#0f172a]",
+    text: "text-blue-50",
+    prose: "prose-invert",
+    isDarkClass: "dark",
+    controlsWrapper: "bg-[#1e293b]/90 border-[#334155]",
+    controlsText: "text-blue-100 hover:text-blue-400",
+    controlsDisabled: "disabled:opacity-30 disabled:hover:text-blue-100",
+    btnSecondary: "bg-[#1e293b] border-[#334155] hover:bg-[#334155] text-blue-100",
+    pattern: { 
+      backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px)', 
+      backgroundSize: '40px 40px' 
+    }
   }
 };
 
@@ -209,7 +215,26 @@ const SlideView = () => {
       </button>
 
       {isActive && (
-        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} ${currentStyle.isDarkClass} transition-colors duration-300`} style={{ cursor: "crosshair" }}>
+        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} ${currentStyle.isDarkClass} transition-colors duration-500`} style={{ cursor: "crosshair" }}>
+          
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-50 transition-opacity duration-500 pointer-events-none" style={currentStyle.pattern}></div>
+
+          {/* Brand Identity */}
+          <div className="absolute top-6 left-8 z-30 flex items-center space-x-3 opacity-60 pointer-events-none">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center backdrop-blur-sm border border-primary/30">
+              <DynamicIcon icon="FaGraduationCap" className={`text-xl ${currentStyle.text}`} />
+            </div>
+            <div>
+              <div className={`font-primary font-bold tracking-wider text-sm uppercase ${currentStyle.text}`}>
+                Teknologi Newbie
+              </div>
+              <div className="text-xs opacity-60 font-secondary tracking-widest">
+                Slide Presentation
+              </div>
+            </div>
+          </div>
+
           {/* Canvas for drawing */}
           <canvas
             ref={canvasRef}
@@ -226,7 +251,7 @@ const SlideView = () => {
           {/* Slide Content */}
           <div 
             ref={scrollContainerRef}
-            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-20 md:p-12 md:pt-20 overflow-y-auto pointer-events-none pb-24"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-28 md:p-12 md:pt-28 overflow-y-auto pointer-events-none pb-24"
           >
             <div 
               className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300`}
@@ -235,28 +260,28 @@ const SlideView = () => {
           </div>
 
           {/* Theme Selector (Bottom Left) */}
-          <div className={`absolute bottom-4 left-4 z-30 flex space-x-2 ${currentStyle.controlsWrapper} px-3 py-1.5 rounded-full backdrop-blur shadow-lg border text-xs`}>
-            <button onClick={() => setTheme('light')} className={`px-2 py-1 rounded ${theme === 'light' ? 'bg-primary text-white' : currentStyle.controlsText} transition-colors`}>Light</button>
-            <button onClick={() => setTheme('dark')} className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-primary text-white' : currentStyle.controlsText} transition-colors`}>Dark</button>
-            <button onClick={() => setTheme('sepia')} className={`px-2 py-1 rounded ${theme === 'sepia' ? 'bg-primary text-white' : currentStyle.controlsText} transition-colors`}>Sepia</button>
+          <div className={`absolute bottom-6 left-8 z-30 flex space-x-2 ${currentStyle.controlsWrapper} px-3 py-1.5 rounded-full backdrop-blur shadow-lg border text-xs`}>
+            <button onClick={() => setTheme('light')} className={`px-3 py-1.5 rounded-full font-medium ${theme === 'light' ? 'bg-primary text-white shadow-md' : currentStyle.controlsText} transition-all`}>Light</button>
+            <button onClick={() => setTheme('dark')} className={`px-3 py-1.5 rounded-full font-medium ${theme === 'dark' ? 'bg-primary text-white shadow-md' : currentStyle.controlsText} transition-all`}>Dark</button>
+            <button onClick={() => setTheme('midnight')} className={`px-3 py-1.5 rounded-full font-medium ${theme === 'midnight' ? 'bg-blue-600 text-white shadow-md' : currentStyle.controlsText} transition-all`}>Midnight</button>
           </div>
 
           {/* Pagination Controls Container (Smaller and at Bottom Center) */}
-          <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-3 ${currentStyle.controlsWrapper} px-4 py-2 rounded-full backdrop-blur shadow-lg border text-sm`}>
+          <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-4 ${currentStyle.controlsWrapper} px-5 py-2.5 rounded-full backdrop-blur shadow-lg border text-sm`}>
             <button 
               onClick={() => setCurrentSlideIndex(Math.max(currentSlideIndex - 1, 0))}
-              className={`${currentStyle.controlsText} ${currentStyle.controlsDisabled} transition-colors`}
+              className={`${currentStyle.controlsText} ${currentStyle.controlsDisabled} transition-all hover:scale-110 active:scale-95`}
               disabled={currentSlideIndex === 0}
               title="Slide Sebelumnya (Panah Kiri)"
             >
               <DynamicIcon icon="FaChevronLeft" className="text-lg" />
             </button>
-            <span className={`font-semibold min-w-[2.5rem] text-center ${currentStyle.controlsText.split(' ')[0]}`}>
-              {currentSlideIndex + 1} / {slides.length}
+            <span className={`font-semibold min-w-[3rem] text-center tracking-widest ${currentStyle.controlsText.split(' ')[0]}`}>
+              {currentSlideIndex + 1} <span className="opacity-40">/</span> {slides.length}
             </span>
             <button 
               onClick={() => setCurrentSlideIndex(Math.min(currentSlideIndex + 1, slides.length - 1))}
-              className={`${currentStyle.controlsText} ${currentStyle.controlsDisabled} transition-colors`}
+              className={`${currentStyle.controlsText} ${currentStyle.controlsDisabled} transition-all hover:scale-110 active:scale-95`}
               disabled={currentSlideIndex === slides.length - 1}
               title="Slide Selanjutnya (Panah Kanan)"
             >
@@ -265,20 +290,20 @@ const SlideView = () => {
           </div>
           
           {/* Action Buttons (Top Right) */}
-          <div className="absolute top-4 right-4 z-30 flex space-x-3">
+          <div className="absolute top-6 right-8 z-30 flex space-x-3">
              <button
               onClick={clearCanvas}
-              className={`flex items-center justify-center w-10 h-10 ${currentStyle.btnSecondary} rounded-full transition-colors shadow-lg border`}
+              className={`flex items-center justify-center w-11 h-11 ${currentStyle.btnSecondary} rounded-full transition-all shadow-lg border hover:scale-105 active:scale-95`}
               title="Bersihkan Coretan (Tekan 'C')"
             >
-              <DynamicIcon icon="FaEraser" className="text-base" />
+              <DynamicIcon icon="FaEraser" className="text-lg" />
             </button>
             <button
               onClick={closeSlideView}
-              className="flex items-center justify-center w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors shadow-lg"
+              className="flex items-center justify-center w-11 h-11 bg-red-500 hover:bg-red-600 border border-red-400 text-white rounded-full transition-all shadow-lg hover:scale-105 active:scale-95"
               title="Tutup Presentasi (Tekan 'ESC')"
             >
-              <DynamicIcon icon="FaXmark" className="text-lg" />
+              <DynamicIcon icon="FaXmark" className="text-xl" />
             </button>
           </div>
 
@@ -287,16 +312,20 @@ const SlideView = () => {
                max-height: 50vh;
                object-fit: contain;
                margin: 0 auto;
+               border-radius: 0.5rem;
+               box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             }
             .slide-content-wrapper h2, .slide-content-wrapper h3 {
                color: #4ade80; 
                margin-top: 0;
+               font-weight: 800;
+               letter-spacing: -0.025em;
             }
             .light .slide-content-wrapper h2, .light .slide-content-wrapper h3 {
                color: #059669; 
             }
-            .sepia .slide-content-wrapper h2, .sepia .slide-content-wrapper h3 {
-               color: #92400e; 
+            .midnight .slide-content-wrapper h2, .midnight .slide-content-wrapper h3 {
+               color: #38bdf8; 
             }
           `}} />
         </div>
