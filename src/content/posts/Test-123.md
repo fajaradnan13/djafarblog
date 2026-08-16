@@ -3,6 +3,7 @@ title: Test 123
 meta_title: test123
 description: Ini adalah halaman test
 date: 2026-08-14T06:55:49.152Z
+featured: true
 categories:
   - Security
 ---
