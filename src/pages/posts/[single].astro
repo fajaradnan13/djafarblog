@@ -156,6 +156,17 @@ const relatedPosts = similarItems(post, postEntries);
         if (block.querySelector(".copy-code-btn")) return;
 
         block.style.position = "relative";
+        block.style.paddingTop = "3rem"; // Add space for mac controls
+        
+        // Create macOS window controls
+        const macControls = document.createElement("div");
+        macControls.className = "absolute top-4 left-4 flex gap-2 z-10 opacity-70 group-hover:opacity-100 transition-opacity";
+        macControls.innerHTML = `
+          <div class="w-3 h-3 rounded-full bg-[#ff5f56] shadow-sm"></div>
+          <div class="w-3 h-3 rounded-full bg-[#ffbd2e] shadow-sm"></div>
+          <div class="w-3 h-3 rounded-full bg-[#27c93f] shadow-sm"></div>
+        `;
+        block.appendChild(macControls);
         
         const button = document.createElement("button");
         button.className = "copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white px-2 py-1 rounded text-xs transition-colors backdrop-blur-sm border border-gray-600/50 flex items-center gap-1 opacity-0 group-hover:opacity-100";
