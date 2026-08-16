@@ -1,0 +1,91 @@
+---
+import TableOfContents from "./TableOfContents.astro";
+import type { MarkdownHeading } from "astro";
+import DynamicIcon from "@/helpers/DynamicIcon";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const hasHeadings = headings && headings.length > 0;
+---
+
+{hasHeadings && (
+  <div class="lg:hidden">
+    {/* Floating Button */}
+    <button
+      id="mobile-toc-btn"
+      class="fixed bottom-6 left-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-theme-light border border-border text-primary shadow-lg transition-transform hover:scale-105 dark:bg-darkmode-theme-light dark:border-darkmode-border"
+      aria-label="Tampilkan Daftar Isi"
+    >
+      <DynamicIcon icon="FaListUl" className="text-xl" />
+    </button>
+
+    {/* Overlay */}
+    <div
+      id="mobile-toc-overlay"
+      class="fixed inset-0 z-50 hidden bg-black/50 opacity-0 transition-opacity duration-300 backdrop-blur-sm"
+    ></div>
+
+    {/* Bottom Sheet */}
+    <div
+      id="mobile-toc-sheet"
+      class="fixed bottom-0 left-0 right-0 z-50 flex max-h-[85vh] translate-y-full flex-col rounded-t-2xl bg-body shadow-2xl transition-transform duration-300 dark:bg-darkmode-body"
+    >
+      {/* Handle / Close Area */}
+      <div class="flex items-center justify-between border-b border-border p-4 dark:border-darkmode-border">
+        <div class="w-8"></div> {/* Spacer for centering */}
+        <div class="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+        <button id="close-toc-btn" class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+          <DynamicIcon icon="FaXmark" className="text-lg" />
+        </button>
+      </div>
+
+      {/* Content Area */}
+      <div class="overflow-y-auto p-6 pt-2">
+        <TableOfContents headings={headings} />
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const btn = document.getElementById("mobile-toc-btn");
+    const overlay = document.getElementById("mobile-toc-overlay");
+    const sheet = document.getElementById("mobile-toc-sheet");
+    const closeBtn = document.getElementById("close-toc-btn");
+    
+    if (!btn || !overlay || !sheet) return;
+
+    const openSheet = () => {
+      overlay.classList.remove("hidden");
+      // Small delay to allow display:block to apply before animating opacity
+      setTimeout(() => {
+        overlay.classList.remove("opacity-0");
+        sheet.classList.remove("translate-y-full");
+      }, 10);
+      document.body.style.overflow = "hidden"; // Prevent scrolling
+    };
+
+    const closeSheet = () => {
+      overlay.classList.add("opacity-0");
+      sheet.classList.add("translate-y-full");
+      setTimeout(() => {
+        overlay.classList.add("hidden");
+      }, 300); // Wait for transition
+      document.body.style.overflow = "";
+    };
+
+    btn.addEventListener("click", openSheet);
+    closeBtn?.addEventListener("click", closeSheet);
+    overlay.addEventListener("click", closeSheet);
+
+    // Close when a link inside TOC is clicked
+    const tocLinks = sheet.querySelectorAll('.toc-link');
+    tocLinks.forEach(link => {
+      link.addEventListener("click", closeSheet);
+    });
+  });
+</script>

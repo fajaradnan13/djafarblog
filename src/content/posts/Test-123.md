@@ -9,11 +9,10 @@ categories:
 
 ## Jangan Begitu
 
-semasdkalskjdalksjdaskjdalsdas
+semasdkalskjdalksjdaskjdalsdasdasddasdasdhjahsjdahsdjasdhjahsgdjahsdjahdssdjahsdasd
 
-dasddasdasdhjahsjdahsdjasdhjah
-
-sgdjahsdjahdssdjahsdasd
+> [!NOTE]
+> Ini adalah sebuah catatan penting yang akan diubah menjadi UI Box yang elegan!
 
 ### Ada 2
 

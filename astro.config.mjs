@@ -3,6 +3,7 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { remarkReadingTime } from "./scripts/readingTime.mjs";
+import rehypeGithubAlerts from "./scripts/rehype-github-alerts.mjs";
 
 import { defineConfig, fontProviders, sharpImageService } from "astro/config";
 import config from "./src/config/config.json";
@@ -56,14 +57,15 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap(),
-
     mdx(),
   ],
   markdown: {
     remarkPlugins: [remarkReadingTime],
+    rehypePlugins: [rehypeGithubAlerts],
     shikiConfig: {
       theme: "one-dark-pro",
       wrap: true,
     },
+    extendDefaultPlugins: true,
   },
 });
