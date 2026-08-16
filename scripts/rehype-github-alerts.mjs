@@ -71,7 +71,8 @@ export default function rehypeGithubAlerts() {
                   child.properties = child.properties || {};
                   child.properties.className = [
                     "not-prose", "my-6", "px-5", "py-4", "rounded-lg", "border-l-4", 
-                    alertData.bg, alertData.border, alertData.className, "text-base", "shadow-sm"
+                    alertData.bg, alertData.border, alertData.className, "text-base", "shadow-sm", 
+                    "text-slate-800", "dark:text-slate-200"
                   ];
                   
                   // Clean up the text node

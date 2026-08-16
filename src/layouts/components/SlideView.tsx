@@ -13,7 +13,7 @@ const THEMES = {
     controlsText: "text-white hover:text-primary",
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-white",
     btnSecondary: "bg-gray-800 border-gray-700 hover:bg-gray-700 text-white",
-    pattern: { backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px)', backgroundSize: '24px 24px' }
+    pattern: { backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)', backgroundSize: '24px 24px' }
   },
   light: {
     bg: "bg-slate-50",
@@ -24,7 +24,7 @@ const THEMES = {
     controlsText: "text-slate-800 hover:text-primary",
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-slate-800",
     btnSecondary: "bg-white border-gray-200 hover:bg-gray-100 text-slate-800",
-    pattern: { backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }
+    pattern: { backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }
   },
   midnight: {
     bg: "bg-[#0f172a]",
@@ -36,7 +36,7 @@ const THEMES = {
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-blue-100",
     btnSecondary: "bg-[#1e293b] border-[#334155] hover:bg-[#334155] text-blue-100",
     pattern: { 
-      backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px)', 
+      backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px)', 
       backgroundSize: '40px 40px' 
     }
   }
@@ -218,22 +218,7 @@ const SlideView = () => {
         <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} ${currentStyle.isDarkClass} transition-colors duration-500`} style={{ cursor: "crosshair" }}>
           
           {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-50 transition-opacity duration-500 pointer-events-none" style={currentStyle.pattern}></div>
-
-          {/* Brand Identity */}
-          <div className="absolute top-6 left-8 z-30 flex items-center space-x-3 opacity-60 pointer-events-none">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center backdrop-blur-sm border border-primary/30">
-              <DynamicIcon icon="FaGraduationCap" className={`text-xl ${currentStyle.text}`} />
-            </div>
-            <div>
-              <div className={`font-primary font-bold tracking-wider text-sm uppercase ${currentStyle.text}`}>
-                Teknologi Newbie
-              </div>
-              <div className="text-xs opacity-60 font-secondary tracking-widest">
-                Slide Presentation
-              </div>
-            </div>
-          </div>
+          <div className="absolute inset-0 opacity-100 transition-opacity duration-500 pointer-events-none" style={currentStyle.pattern}></div>
 
           {/* Canvas for drawing */}
           <canvas
@@ -251,8 +236,23 @@ const SlideView = () => {
           {/* Slide Content */}
           <div 
             ref={scrollContainerRef}
-            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-28 md:p-12 md:pt-28 overflow-y-auto pointer-events-none pb-24"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-16 md:p-12 md:pt-16 overflow-y-auto pointer-events-none pb-24"
           >
+            {/* Brand Identity - scrolls with content */}
+            <div className="w-full max-w-5xl flex items-center space-x-3 opacity-60 mb-8 pointer-events-auto">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center backdrop-blur-sm border border-primary/30">
+                <DynamicIcon icon="FaGraduationCap" className={`text-xl ${currentStyle.text}`} />
+              </div>
+              <div>
+                <div className={`font-primary font-bold tracking-wider text-sm uppercase ${currentStyle.text}`}>
+                  Teknologi Newbie
+                </div>
+                <div className="text-xs opacity-60 font-secondary tracking-widest">
+                  Slide Presentation
+                </div>
+              </div>
+            </div>
+
             <div 
               className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300`}
               dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
@@ -320,6 +320,10 @@ const SlideView = () => {
                margin-top: 0;
                font-weight: 800;
                letter-spacing: -0.025em;
+               border-bottom: 2px solid currentColor;
+               padding-bottom: 1rem;
+               margin-bottom: 2.5rem;
+               opacity: 0.9;
             }
             .light .slide-content-wrapper h2, .light .slide-content-wrapper h3 {
                color: #059669; 
