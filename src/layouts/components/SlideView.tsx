@@ -282,7 +282,7 @@ const SlideView = () => {
       </button>
 
       {isActive && (
-        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} transition-colors duration-500`} style={{ cursor: "crosshair" }}>
+        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} transition-colors duration-500`} style={{ cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\"><circle cx=\"10\" cy=\"10\" r=\"5\" fill=\"%23ef4444\" stroke=\"white\" stroke-width=\"2\"/></svg>') 10 10, crosshair" }}>
           
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-100 transition-opacity duration-500 pointer-events-none" style={currentStyle.pattern}></div>
@@ -290,7 +290,7 @@ const SlideView = () => {
           {/* Canvas for drawing */}
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 z-20 touch-none"
+            className="absolute inset-0 z-10 touch-none"
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
@@ -303,7 +303,7 @@ const SlideView = () => {
           {/* Slide Content */}
           <div 
             ref={scrollContainerRef}
-            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-16 md:p-12 md:pt-16 overflow-y-auto pointer-events-none pb-32"
+            className="absolute inset-0 z-20 flex flex-col items-center justify-start p-8 pt-16 md:p-12 md:pt-16 overflow-y-auto pointer-events-none pb-32"
           >
             {/* Brand Identity - scrolls with content */}
             <div className="w-full max-w-5xl flex items-center space-x-3 opacity-60 mb-8 pointer-events-auto">
@@ -321,7 +321,7 @@ const SlideView = () => {
             </div>
 
             <div 
-              className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300 pointer-events-auto`}
+              className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300 pointer-events-none`}
               style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
               dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
             />
@@ -401,20 +401,36 @@ const SlideView = () => {
                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             }
             .slide-content-wrapper h2, .slide-content-wrapper h3 {
-               color: #4ade80; 
                margin-top: 0;
-               font-weight: 800;
+               font-weight: 900;
                letter-spacing: -0.025em;
                border-bottom: 2px solid currentColor;
                padding-bottom: 1rem;
                margin-bottom: 2.5rem;
-               opacity: 0.9;
+               background-clip: text;
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+            }
+            .dark .slide-content-wrapper h2, .dark .slide-content-wrapper h3 {
+               background-image: linear-gradient(to right, #4ade80, #10b981);
+               border-bottom-color: rgba(74, 222, 128, 0.2);
+               filter: drop-shadow(0 4px 6px rgba(16, 185, 129, 0.1));
             }
             .light .slide-content-wrapper h2, .light .slide-content-wrapper h3 {
-               color: #059669; 
+               background-image: linear-gradient(to right, #059669, #047857);
+               border-bottom-color: rgba(5, 150, 105, 0.2);
             }
             .midnight .slide-content-wrapper h2, .midnight .slide-content-wrapper h3 {
-               color: #38bdf8; 
+               background-image: linear-gradient(to right, #38bdf8, #0284c7);
+               border-bottom-color: rgba(56, 189, 248, 0.2);
+               filter: drop-shadow(0 4px 6px rgba(14, 165, 233, 0.15));
+            }
+            .slide-content-wrapper .copy-code-btn {
+               pointer-events: auto;
+               cursor: pointer;
+            }
+            .slide-content-wrapper pre {
+               pointer-events: auto;
             }
           `}} />
         </div>
