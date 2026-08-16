@@ -47,6 +47,8 @@ const SlideView = () => {
   const [slides, setSlides] = useState<string[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [theme, setTheme] = useState<ThemeType>('dark');
+  const [zoom, setZoom] = useState(1);
+  const [originalGlobalDark, setOriginalGlobalDark] = useState(false);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -78,14 +80,34 @@ const SlideView = () => {
     setSlides(parsedSlides);
     setCurrentSlideIndex(0);
     setIsActive(true);
+    setZoom(1);
     
     // Check global theme preference for initial state
-    if (!document.documentElement.classList.contains('dark')) {
-      setTheme('light');
+    const isDark = document.documentElement.classList.contains('dark');
+    setOriginalGlobalDark(isDark);
+    setTheme(isDark ? 'dark' : 'light');
+  };
+
+  const closeSlideView = () => {
+    setIsActive(false);
+    // Restore original global theme
+    if (originalGlobalDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   };
 
-  const closeSlideView = () => setIsActive(false);
+  // Sync global HTML dark class with SlideView theme so nested components (like Admonitions) style correctly
+  useEffect(() => {
+    if (isActive) {
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    }
+  }, [theme, isActive]);
 
   // Setup Canvas
   useEffect(() => {
@@ -195,6 +217,12 @@ const SlideView = () => {
         scrollContainerRef.current?.scrollBy({ top: -150, behavior: "smooth" });
       } else if (e.key.toLowerCase() === "c") {
         clearCanvas();
+      } else if (e.key === "=" || e.key === "+") {
+        setZoom(prev => Math.min(prev + 0.1, 2.5));
+      } else if (e.key === "-") {
+        setZoom(prev => Math.max(prev - 0.1, 0.5));
+      } else if (e.key === "0") {
+        setZoom(1);
       }
     };
 
@@ -215,7 +243,7 @@ const SlideView = () => {
       </button>
 
       {isActive && (
-        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} ${currentStyle.isDarkClass} transition-colors duration-500`} style={{ cursor: "crosshair" }}>
+        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} transition-colors duration-500`} style={{ cursor: "crosshair" }}>
           
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-100 transition-opacity duration-500 pointer-events-none" style={currentStyle.pattern}></div>
@@ -236,7 +264,7 @@ const SlideView = () => {
           {/* Slide Content */}
           <div 
             ref={scrollContainerRef}
-            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-16 md:p-12 md:pt-16 overflow-y-auto pointer-events-none pb-24"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-16 md:p-12 md:pt-16 overflow-y-auto pointer-events-none pb-32"
           >
             {/* Brand Identity - scrolls with content */}
             <div className="w-full max-w-5xl flex items-center space-x-3 opacity-60 mb-8 pointer-events-auto">
@@ -254,7 +282,8 @@ const SlideView = () => {
             </div>
 
             <div 
-              className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300`}
+              className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300 pointer-events-auto`}
+              style={{ transform: \`scale(\${zoom})\`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
               dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
             />
           </div>
@@ -289,6 +318,23 @@ const SlideView = () => {
             </button>
           </div>
           
+          {/* Zoom Controls (Bottom Right) */}
+          <div className={`absolute bottom-6 right-8 z-30 flex items-center space-x-1 ${currentStyle.controlsWrapper} px-2 py-1.5 rounded-full backdrop-blur shadow-lg border text-sm`}>
+            <button onClick={() => setZoom(prev => Math.max(prev - 0.1, 0.5))} className={`w-8 h-8 flex items-center justify-center rounded-full ${currentStyle.controlsText} transition-all hover:bg-black/10 dark:hover:bg-white/10 active:scale-90`} title="Zoom Out (-)">
+              <DynamicIcon icon="FaMinus" className="text-xs" />
+            </button>
+            <span className={`font-mono text-xs font-semibold w-12 text-center ${currentStyle.controlsText.split(' ')[0]}`} title="Zoom Level">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button onClick={() => setZoom(prev => Math.min(prev + 0.1, 2.5))} className={`w-8 h-8 flex items-center justify-center rounded-full ${currentStyle.controlsText} transition-all hover:bg-black/10 dark:hover:bg-white/10 active:scale-90`} title="Zoom In (+)">
+              <DynamicIcon icon="FaPlus" className="text-xs" />
+            </button>
+            <div className="w-px h-4 bg-gray-500/30 mx-1"></div>
+            <button onClick={() => setZoom(1)} className={`w-8 h-8 flex items-center justify-center rounded-full ${currentStyle.controlsText} transition-all hover:bg-black/10 dark:hover:bg-white/10 active:scale-90`} title="Reset Zoom (0)">
+              <DynamicIcon icon="FaRotateRight" className="text-xs" />
+            </button>
+          </div>
+
           {/* Action Buttons (Top Right) */}
           <div className="absolute top-6 right-8 z-30 flex space-x-3">
              <button
