@@ -1,10 +1,47 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import DynamicIcon from "@/helpers/DynamicIcon";
 
+type ThemeType = 'dark' | 'light' | 'sepia';
+
+const THEMES = {
+  dark: {
+    bg: "bg-slate-950",
+    text: "text-white",
+    prose: "prose-invert",
+    isDarkClass: "dark",
+    controlsWrapper: "bg-gray-900/90 border-gray-700",
+    controlsText: "text-white hover:text-primary",
+    controlsDisabled: "disabled:opacity-30 disabled:hover:text-white",
+    btnSecondary: "bg-gray-800 border-gray-700 hover:bg-gray-700 text-white",
+  },
+  light: {
+    bg: "bg-white",
+    text: "text-slate-900",
+    prose: "prose-slate",
+    isDarkClass: "",
+    controlsWrapper: "bg-white/90 border-gray-200",
+    controlsText: "text-slate-800 hover:text-primary",
+    controlsDisabled: "disabled:opacity-30 disabled:hover:text-slate-800",
+    btnSecondary: "bg-gray-100 border-gray-200 hover:bg-gray-200 text-slate-800",
+  },
+  sepia: {
+    bg: "bg-[#f4ecd8]",
+    text: "text-[#5b4636]",
+    prose: "prose-stone",
+    isDarkClass: "",
+    controlsWrapper: "bg-[#e8dec5]/90 border-[#d0c3a8]",
+    controlsText: "text-[#5b4636] hover:text-primary",
+    controlsDisabled: "disabled:opacity-30 disabled:hover:text-[#5b4636]",
+    btnSecondary: "bg-[#e8dec5] border-[#d0c3a8] hover:bg-[#d0c3a8] text-[#5b4636]",
+  }
+};
+
 const SlideView = () => {
   const [isActive, setIsActive] = useState(false);
   const [slides, setSlides] = useState<string[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [theme, setTheme] = useState<ThemeType>('dark');
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -35,6 +72,11 @@ const SlideView = () => {
     setSlides(parsedSlides);
     setCurrentSlideIndex(0);
     setIsActive(true);
+    
+    // Check global theme preference for initial state
+    if (!document.documentElement.classList.contains('dark')) {
+      setTheme('light');
+    }
   };
 
   const closeSlideView = () => setIsActive(false);
@@ -43,14 +85,13 @@ const SlideView = () => {
   useEffect(() => {
     if (isActive && canvasRef.current) {
       const canvas = canvasRef.current;
-      // Make canvas full screen
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
       const context = canvas.getContext("2d");
       if (context) {
         context.lineCap = "round";
-        context.strokeStyle = "red";
+        context.strokeStyle = "#ef4444"; // Always red for contrast
         context.lineWidth = 4;
         contextRef.current = context;
       }
@@ -60,7 +101,6 @@ const SlideView = () => {
   useEffect(() => {
     const handleResize = () => {
       if (isActive && canvasRef.current && contextRef.current) {
-        // Save current drawing
         const canvas = canvasRef.current;
         const context = contextRef.current;
         const tempCanvas = document.createElement('canvas');
@@ -73,12 +113,10 @@ const SlideView = () => {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
           
-          // Restore context settings
           context.lineCap = "round";
-          context.strokeStyle = "red";
+          context.strokeStyle = "#ef4444";
           context.lineWidth = 4;
           
-          // Restore drawing
           context.drawImage(tempCanvas, 0, 0);
         }
       }
@@ -91,10 +129,8 @@ const SlideView = () => {
   // Drawing functions
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     if (!contextRef.current) return;
-    
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-
     contextRef.current.beginPath();
     contextRef.current.moveTo(clientX, clientY);
     setIsDrawing(true);
@@ -102,10 +138,8 @@ const SlideView = () => {
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDrawing || !contextRef.current) return;
-    
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-
     contextRef.current.lineTo(clientX, clientY);
     contextRef.current.stroke();
   };
@@ -126,7 +160,6 @@ const SlideView = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const scrollContainer = scrollContainerRef.current;
-    
     if (!canvas || !scrollContainer || !isActive) return;
     
     const handleWheel = (e: WheelEvent) => {
@@ -149,7 +182,7 @@ const SlideView = () => {
       } else if (e.key === "ArrowLeft") {
         setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
       } else if (e.key === "ArrowDown") {
-        e.preventDefault(); // Prevent default page scroll
+        e.preventDefault();
         scrollContainerRef.current?.scrollBy({ top: 150, behavior: "smooth" });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
@@ -163,6 +196,8 @@ const SlideView = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isActive, slides.length, clearCanvas]);
 
+  const currentStyle = THEMES[theme];
+
   return (
     <>
       <button
@@ -174,7 +209,7 @@ const SlideView = () => {
       </button>
 
       {isActive && (
-        <div className="fixed inset-0 z-[9999] bg-slate-950 text-white" style={{ cursor: "crosshair" }}>
+        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} ${currentStyle.isDarkClass} transition-colors duration-300`} style={{ cursor: "crosshair" }}>
           {/* Canvas for drawing */}
           <canvas
             ref={canvasRef}
@@ -191,51 +226,59 @@ const SlideView = () => {
           {/* Slide Content */}
           <div 
             ref={scrollContainerRef}
-            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-24 md:p-16 md:pt-24 overflow-y-auto pointer-events-none pb-32"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-start p-8 pt-20 md:p-12 md:pt-20 overflow-y-auto pointer-events-none pb-24"
           >
             <div 
-              className="prose prose-invert prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper"
+              className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300`}
               dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
             />
           </div>
 
-          {/* Controls Container */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-6 bg-gray-900/90 border border-gray-700 px-6 py-3 rounded-full backdrop-blur shadow-2xl">
+          {/* Theme Selector (Bottom Left) */}
+          <div className={`absolute bottom-4 left-4 z-30 flex space-x-2 ${currentStyle.controlsWrapper} px-3 py-1.5 rounded-full backdrop-blur shadow-lg border text-xs`}>
+            <button onClick={() => setTheme('light')} className={`px-2 py-1 rounded ${theme === 'light' ? 'bg-primary text-white' : currentStyle.controlsText} transition-colors`}>Light</button>
+            <button onClick={() => setTheme('dark')} className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-primary text-white' : currentStyle.controlsText} transition-colors`}>Dark</button>
+            <button onClick={() => setTheme('sepia')} className={`px-2 py-1 rounded ${theme === 'sepia' ? 'bg-primary text-white' : currentStyle.controlsText} transition-colors`}>Sepia</button>
+          </div>
+
+          {/* Pagination Controls Container (Smaller and at Bottom Center) */}
+          <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-3 ${currentStyle.controlsWrapper} px-4 py-2 rounded-full backdrop-blur shadow-lg border text-sm`}>
             <button 
               onClick={() => setCurrentSlideIndex(Math.max(currentSlideIndex - 1, 0))}
-              className="text-white hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-white"
+              className={`${currentStyle.controlsText} ${currentStyle.controlsDisabled} transition-colors`}
               disabled={currentSlideIndex === 0}
               title="Slide Sebelumnya (Panah Kiri)"
             >
-              <DynamicIcon icon="FaChevronLeft" className="text-xl" />
+              <DynamicIcon icon="FaChevronLeft" className="text-lg" />
             </button>
-            <span className="font-semibold text-gray-300 min-w-[3rem] text-center">
+            <span className={`font-semibold min-w-[2.5rem] text-center ${currentStyle.controlsText.split(' ')[0]}`}>
               {currentSlideIndex + 1} / {slides.length}
             </span>
             <button 
               onClick={() => setCurrentSlideIndex(Math.min(currentSlideIndex + 1, slides.length - 1))}
-              className="text-white hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-white"
+              className={`${currentStyle.controlsText} ${currentStyle.controlsDisabled} transition-colors`}
               disabled={currentSlideIndex === slides.length - 1}
               title="Slide Selanjutnya (Panah Kanan)"
             >
-              <DynamicIcon icon="FaChevronRight" className="text-xl" />
+              <DynamicIcon icon="FaChevronRight" className="text-lg" />
             </button>
           </div>
           
-          <div className="absolute top-6 right-6 z-30 flex space-x-4">
+          {/* Action Buttons (Top Right) */}
+          <div className="absolute top-4 right-4 z-30 flex space-x-3">
              <button
               onClick={clearCanvas}
-              className="flex items-center justify-center w-12 h-12 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-white rounded-full transition-colors shadow-lg"
+              className={`flex items-center justify-center w-10 h-10 ${currentStyle.btnSecondary} rounded-full transition-colors shadow-lg border`}
               title="Bersihkan Coretan (Tekan 'C')"
             >
-              <DynamicIcon icon="FaEraser" className="text-lg" />
+              <DynamicIcon icon="FaEraser" className="text-base" />
             </button>
             <button
               onClick={closeSlideView}
-              className="flex items-center justify-center w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors shadow-lg"
+              className="flex items-center justify-center w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors shadow-lg"
               title="Tutup Presentasi (Tekan 'ESC')"
             >
-              <DynamicIcon icon="FaXmark" className="text-xl" />
+              <DynamicIcon icon="FaXmark" className="text-lg" />
             </button>
           </div>
 
@@ -248,6 +291,12 @@ const SlideView = () => {
             .slide-content-wrapper h2, .slide-content-wrapper h3 {
                color: #4ade80; 
                margin-top: 0;
+            }
+            .light .slide-content-wrapper h2, .light .slide-content-wrapper h3 {
+               color: #059669; 
+            }
+            .sepia .slide-content-wrapper h2, .sepia .slide-content-wrapper h3 {
+               color: #92400e; 
             }
           `}} />
         </div>

@@ -63,7 +63,7 @@ const relatedPosts = similarItems(post, postEntries);
               }
               <ul class={`${image ? "absolute top-3 left-2" : "mt-4 mb-2"} flex flex-wrap items-center`}>
                 {
-                  categories.map((tag) => (
+                  post.data.categories?.map((tag) => (
                     <li class="m-2 inline-flex h-7 rounded-[35px] bg-primary px-3 text-white">
                       <a
                         aria-label="categories"
