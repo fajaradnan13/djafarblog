@@ -13,7 +13,8 @@ const THEMES = {
     controlsText: "text-white hover:text-primary",
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-white",
     btnSecondary: "bg-gray-800 border-gray-700 hover:bg-gray-700 text-white",
-    pattern: { backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)', backgroundSize: '24px 24px' }
+    pattern: { backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)', backgroundSize: '24px 24px' },
+    brandCircle: "bg-white/10 border-white/20"
   },
   light: {
     bg: "bg-slate-50",
@@ -24,7 +25,8 @@ const THEMES = {
     controlsText: "text-slate-800 hover:text-primary",
     controlsDisabled: "disabled:opacity-30 disabled:hover:text-slate-800",
     btnSecondary: "bg-white border-gray-200 hover:bg-gray-100 text-slate-800",
-    pattern: { backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }
+    pattern: { backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' },
+    brandCircle: "bg-black/5 border-black/10"
   },
   midnight: {
     bg: "bg-[#0f172a]",
@@ -38,7 +40,8 @@ const THEMES = {
     pattern: { 
       backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px)', 
       backgroundSize: '40px 40px' 
-    }
+    },
+    brandCircle: "bg-blue-400/10 border-blue-400/20"
   }
 };
 
@@ -282,7 +285,7 @@ const SlideView = () => {
       </button>
 
       {isActive && (
-        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} transition-colors duration-500`} style={{ cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\"><circle cx=\"10\" cy=\"10\" r=\"5\" fill=\"%23ef4444\" stroke=\"white\" stroke-width=\"2\"/></svg>') 10 10, crosshair" }}>
+        <div className={`fixed inset-0 z-[9999] ${currentStyle.bg} ${currentStyle.text} theme-${theme} transition-colors duration-500`} style={{ cursor: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\"><circle cx=\"10\" cy=\"10\" r=\"5\" fill=\"%23ef4444\" stroke=\"white\" stroke-width=\"2\"/></svg>') 10 10, crosshair" }}>
           
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-100 transition-opacity duration-500 pointer-events-none" style={currentStyle.pattern}></div>
@@ -307,7 +310,7 @@ const SlideView = () => {
           >
             {/* Brand Identity - scrolls with content */}
             <div className="w-full max-w-5xl flex items-center space-x-3 opacity-60 mb-8 pointer-events-auto">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center backdrop-blur-sm border border-primary/30">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm border ${currentStyle.brandCircle}`}>
                 <DynamicIcon icon="FaGraduationCap" className={`text-xl ${currentStyle.text}`} />
               </div>
               <div>
@@ -411,16 +414,16 @@ const SlideView = () => {
                -webkit-background-clip: text;
                -webkit-text-fill-color: transparent;
             }
-            .dark .slide-content-wrapper h2, .dark .slide-content-wrapper h3 {
+            .theme-dark .slide-content-wrapper h2, .theme-dark .slide-content-wrapper h3 {
                background-image: linear-gradient(to right, #4ade80, #10b981);
                border-bottom-color: rgba(74, 222, 128, 0.2);
                filter: drop-shadow(0 4px 6px rgba(16, 185, 129, 0.1));
             }
-            .light .slide-content-wrapper h2, .light .slide-content-wrapper h3 {
+            .theme-light .slide-content-wrapper h2, .theme-light .slide-content-wrapper h3 {
                background-image: linear-gradient(to right, #059669, #047857);
                border-bottom-color: rgba(5, 150, 105, 0.2);
             }
-            .midnight .slide-content-wrapper h2, .midnight .slide-content-wrapper h3 {
+            .theme-midnight .slide-content-wrapper h2, .theme-midnight .slide-content-wrapper h3 {
                background-image: linear-gradient(to right, #38bdf8, #0284c7);
                border-bottom-color: rgba(56, 189, 248, 0.2);
                filter: drop-shadow(0 4px 6px rgba(14, 165, 233, 0.15));
