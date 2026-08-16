@@ -283,7 +283,7 @@ const SlideView = () => {
 
             <div 
               className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300 pointer-events-auto`}
-              style={{ transform: \`scale(\${zoom})\`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
+              style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
               dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
             />
           </div>
