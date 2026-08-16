@@ -198,6 +198,45 @@ const SlideView = () => {
     return () => canvas.removeEventListener("wheel", handleWheel);
   }, [isActive]);
 
+  // Handle copy button clicks via event delegation
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || !isActive) return;
+
+    const handleCopyClick = async (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const copyBtn = target.closest('.copy-code-btn');
+      if (!copyBtn) return;
+
+      const wrapper = copyBtn.closest('.relative.group');
+      if (!wrapper) return;
+
+      const pre = wrapper.querySelector('pre');
+      if (!pre) return;
+
+      // Extract text content without any extra formatting elements
+      const text = pre.innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        const originalHTML = copyBtn.innerHTML;
+        
+        // Show success icon (checkmark)
+        copyBtn.innerHTML = `<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="14" width="14" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Copied!</span>`;
+        copyBtn.classList.add('!text-green-400', 'border-green-400/50');
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+          copyBtn.classList.remove('!text-green-400', 'border-green-400/50');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy', err);
+      }
+    };
+
+    container.addEventListener('click', handleCopyClick);
+    return () => container.removeEventListener('click', handleCopyClick);
+  }, [isActive, slides]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
