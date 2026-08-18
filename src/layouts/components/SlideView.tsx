@@ -445,3 +445,5 @@ const SlideView = ({ title }: SlideViewProps) => {
     </>
   );
 };
+
+export default SlideView;
