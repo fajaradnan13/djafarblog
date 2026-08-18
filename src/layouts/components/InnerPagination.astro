@@ -14,24 +14,23 @@ const next =
   currentPostIndex == lastIndex ? undefined : posts[currentPostIndex + 1]?.id;
 ---
 
-<div class="row">
-  <span class="col">
+<div class="flex items-center justify-between w-full my-6">
+  <div>
     {
       prev && (
-        <a href={prev} class={"btn btn-primary"}>
-          Prev
+        <a href={prev} class="btn btn-primary text-sm px-4 py-2 md:text-base md:px-6 md:py-3 flex items-center">
+          &laquo; Prev
         </a>
       )
     }
-  </span>
-  <span class="col-8"></span>
-  <span class="col">
+  </div>
+  <div>
     {
       next && (
-        <a href={next} class={"btn btn-primary"}>
-          Next
+        <a href={next} class="btn btn-primary text-sm px-4 py-2 md:text-base md:px-6 md:py-3 flex items-center">
+          Next &raquo;
         </a>
       )
     }
-  </span>
+  </div>
 </div>
