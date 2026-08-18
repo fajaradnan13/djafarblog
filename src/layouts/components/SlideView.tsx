@@ -45,7 +45,11 @@ const THEMES = {
   }
 };
 
-const SlideView = () => {
+interface SlideViewProps {
+  title?: string;
+}
+
+const SlideView = ({ title }: SlideViewProps) => {
   const [isActive, setIsActive] = useState(false);
   const [slides, setSlides] = useState<string[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -317,8 +321,8 @@ const SlideView = () => {
                 <div className={`font-primary font-bold tracking-wider text-sm uppercase ${currentStyle.text}`}>
                   Teknologi Newbie
                 </div>
-                <div className="text-xs opacity-60 font-secondary tracking-widest">
-                  Slide Presentation
+                <div className="text-xs opacity-60 font-secondary tracking-widest truncate max-w-[200px] sm:max-w-sm md:max-w-md">
+                  {title || "Slide Presentation"}
                 </div>
               </div>
             </div>
@@ -441,5 +445,3 @@ const SlideView = () => {
     </>
   );
 };
-
-export default SlideView;
