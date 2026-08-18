@@ -3,7 +3,7 @@ title: "Panduan Lengkap Azure Linux: Pengenalan & Instalasi di VirtualBox"
 meta_title: "Tutorial Instalasi Azure Linux Microsoft di VirtualBox"
 description: "Panduan komprehensif membahas fitur utama Azure Linux, arsitektur, dan tutorial instalasi step-by-step menggunakan mesin virtual (VirtualBox)."
 date: 2026-08-16T15:00:00Z
-image: "/images/image-placeholder.png"
+image: ""
 categories:
   - Linux
   - Cloud

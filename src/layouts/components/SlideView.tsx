@@ -278,7 +278,7 @@ const SlideView = () => {
     <>
       <button
         onClick={openSlideView}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_10px_20px_rgba(43,162,131,0.5)] hover:-translate-y-1 hover:scale-105 hover:bg-[#1E6250] transition-all"
+        className="fixed bottom-6 right-6 z-50 hidden md:flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_10px_20px_rgba(43,162,131,0.5)] hover:-translate-y-1 hover:scale-105 hover:bg-[#1E6250] transition-all"
         title="Buka Mode Presentasi"
       >
         <DynamicIcon icon="FaChalkboardUser" className="text-2xl" />
