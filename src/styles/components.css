@@ -124,6 +124,19 @@
       }
     }
   }
+
+  /* Plain text / output code blocks - make text brighter and more readable */
+  pre:has(> code.language-text) {
+    @apply border border-gray-700/50 bg-[#1e1e2e] !important;
+
+    code.language-text {
+      color: #c6d0f5 !important;
+
+      span {
+        color: #c6d0f5 !important;
+      }
+    }
+  }
 }
 
 /* banner */
