@@ -46,8 +46,8 @@ series_part: XX
 ## 📊 Status Progres Ringkas
 
 - **Total Seri Direncanakan**: 11 Level (~125 Episode)
-- **Sudah Terbit (Live)**: 4 Episode (Level 1)
-- **Sedang / Akan Dikerjakan**: Episode 5 — *Membuat & Membaca Isi File (`cat`, `less`, `echo`, `nano`)*
+- **Sudah Terbit (Live)**: 5 Episode (Level 1)
+- **Sedang / Akan Dikerjakan**: Episode 6 — *I/O Redirection (`>`, `>>`, `<`, `2>`)*
 
 ---
 
@@ -63,8 +63,8 @@ Fokus: Fondasi awal terminal, filesystem, navigasi, operasi file, dan perintah e
 | 02 | **Memahami Struktur Filesystem Linux**<br>*(Filosofi Inverted Tree, Tour Direktori `/`, `/home`, `/etc`, `/var`, `/tmp`, dll, Absolute vs Relative Path, Everything is a file)* | ✅ Selesai | [linux-command-02-memahami-filesystem.md](file:///c:/Users/IISM032430/Documents/djafarblog/src/content/posts/linux-command-02-memahami-filesystem.md) |
 | 03 | **Navigasi Direktori dengan `cd`, `pwd`, dan `ls`**<br>*(Kuasai `cd`, `cd ~`, `cd ..`, `cd -`, `ls -lah`, `pwd -P`, Tab completion, skenario jalan-jalan di server)* | ✅ Selesai | [linux-command-03-navigasi-direktori.md](file:///c:/Users/IISM032430/Documents/djafarblog/src/content/posts/linux-command-03-navigasi-direktori.md) |
 | 04 | **File Operation dengan `touch`, `cp`, `mv`, dan `rm`**<br>*(Membuat file kosong, copy file/direktori `-r`, rename/pindah file, hapus aman & bahaya `rm -rf`)* | ✅ Selesai | [linux-command-04-file-operation.md](file:///c:/Users/IISM032430/Documents/djafarblog/src/content/posts/linux-command-04-file-operation.md) |
-| 05 | **Membuat & Membaca Isi File: `cat`, `less`, `echo`, `nano`**<br>*(Membaca file cepat dengan `cat`, paging dengan `less`, input sederhana dengan `echo`, editing dasar dengan `nano`)* | ⏳ **Next** | `src/content/posts/linux-command-05-membaca-membuat-file.md` |
-| 06 | **I/O Redirection: Mengarahkan Output & Input (`>`, `>>`, `<`, `2>`)**<br>*(Standard Output, Standard Error, Append vs Overwrite, Null device `/dev/null`)* | 📋 Rencana | `src/content/posts/linux-command-06-io-redirection.md` |
+| 05 | **Membuat & Membaca Isi File: `cat`, `less`, `echo`, `nano`**<br>*(Membaca file cepat dengan `cat`, paging dengan `less`, input sederhana dengan `echo`, editing dasar dengan `nano`)* | ✅ Selesai | [linux-command-05-membaca-membuat-file.md](file:///c:/Users/IISM032430/Documents/djafarblog/src/content/posts/linux-command-05-membaca-membuat-file.md) |
+| 06 | **I/O Redirection: Mengarahkan Output & Input (`>`, `>>`, `<`, `2>`)**<br>*(Standard Output, Standard Error, Append vs Overwrite, Null device `/dev/null`)* | ⏳ **Next** | `src/content/posts/linux-command-06-io-redirection.md` |
 | 07 | **Kekuatan Linux Pipe (`\|`): Menghubungkan Antar Perintah**<br>*(Filosofi Unix, menggabungkan perintah kecil menjadi satu pipeline dahsyat)* | 📋 Rencana | `src/content/posts/linux-command-07-linux-pipe.md` |
 | 08 | **Wildcards dan Pattern Matching: Seleksi File Kilat**<br>*(Karakter `*`, `?`, `[a-z]`, kurung kurawal `{}` untuk efisiensi kerja massal)* | 📋 Rencana | `src/content/posts/linux-command-08-wildcards-pattern.md` |
 | 09 | **Mencari Bantuan Sendiri: `man`, `--help`, `info`, `type`, `which`**<br>*(Cara membaca dokumentasi bawaan Linux dan mengetahui asal suatu perintah)* | 📋 Rencana | `src/content/posts/linux-command-09-command-help.md` |
