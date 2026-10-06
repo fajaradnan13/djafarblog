@@ -13,49 +13,179 @@ const seriesName = currentPost.data.series;
 const { post_folder } = settings;
 
 let seriesPosts: CollectionEntry<"posts">[] = [];
+let prevPost: CollectionEntry<"posts"> | null = null;
+let nextPost: CollectionEntry<"posts"> | null = null;
+let currentIndex = -1;
 
 if (seriesName) {
   const allPosts = await getSinglePage("posts");
   seriesPosts = allPosts
     .filter((p: any) => p.data.series === seriesName && !p.data.draft)
     .sort((a: any, b: any) => (a.data.series_part || 0) - (b.data.series_part || 0));
+
+  currentIndex = seriesPosts.findIndex((p: any) => p.id === currentPost.id);
+  if (currentIndex !== -1) {
+    prevPost = currentIndex > 0 ? seriesPosts[currentIndex - 1] : null;
+    nextPost = currentIndex < seriesPosts.length - 1 ? seriesPosts[currentIndex + 1] : null;
+  }
 }
+
+const currentPart = currentPost.data.series_part || (currentIndex + 1);
+const totalParts = seriesPosts.length;
 ---
 
 {seriesPosts.length > 1 && (
-  <div class="mt-6 mb-10 rounded-lg border border-border p-6 shadow-sm dark:border-darkmode-border bg-theme-light dark:bg-darkmode-theme-light">
-    <div class="flex items-center mb-6">
-      <DynamicIcon icon="FaRoute" className="text-primary text-xl mr-3" />
-      <h3 class="h5 font-primary m-0 text-text-dark dark:text-darkmode-text-light">Seri Artikel: {seriesName}</h3>
+  <aside class="mt-8 mb-12 rounded-xl border border-border/80 p-5 sm:p-6 shadow-sm dark:border-darkmode-border/80 bg-theme-light dark:bg-darkmode-theme-light transition-all">
+    {/* Header Widget */}
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3.5 border-b border-border/70 dark:border-darkmode-border/70">
+      <div class="flex items-center min-w-0">
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary mr-3 flex-shrink-0">
+          <DynamicIcon icon="FaRoute" className="text-lg" />
+        </div>
+        <div class="min-w-0">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-text-light dark:text-darkmode-text-light m-0">
+            Daftar Seri
+          </p>
+          <h3 class="h6 font-primary m-0 truncate text-text-dark dark:text-darkmode-text-light">
+            {seriesName}
+          </h3>
+        </div>
+      </div>
+      
+      {/* Badge Progres */}
+      <div class="flex items-center gap-1.5 flex-shrink-0">
+        <span class="inline-flex items-center rounded-full bg-primary/15 px-3 py-1 text-xs font-bold text-primary dark:bg-primary/20">
+          Bagian {currentPart} dari {totalParts}
+        </span>
+      </div>
     </div>
     
-    <div class="relative border-l-2 border-border dark:border-darkmode-border ml-3 space-y-6">
-      {seriesPosts.map((post: any) => {
-        const isCurrent = post.id === currentPost.id;
-        return (
-          <div class="relative pl-6">
-            {/* Timeline Dot */}
-            <div class={`absolute -left-[9px] top-1.5 h-4 w-4 rounded-full border-2 border-theme-light dark:border-darkmode-theme-light ${isCurrent ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-            
-            <div class="flex flex-col">
-              <span class="text-xs font-bold text-primary mb-1">Bagian {post.data.series_part}</span>
-              {isCurrent ? (
-                <span class="font-bold text-text-dark dark:text-darkmode-text-light">
-                  {post.data.title} 
-                  <span class="ml-2 inline-block rounded bg-primary/10 px-2 py-0.5 text-[10px] text-primary">Sedang Dibaca</span>
+    {/* Scrollable Timeline List Container */}
+    <div 
+      id="series-timeline-container"
+      class="relative max-h-[340px] overflow-y-auto pr-3 pl-1 -mr-1 my-2 series-custom-scrollbar"
+    >
+      <div class="relative border-l-2 border-border/80 dark:border-darkmode-border/80 ml-3.5 space-y-5 py-2">
+        {seriesPosts.map((post: any) => {
+          const isCurrent = post.id === currentPost.id;
+          return (
+            <div 
+              class={`relative pl-6 transition-all duration-200 ${isCurrent ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}
+              data-series-current={isCurrent ? "true" : undefined}
+            >
+              {/* Timeline Indicator Node */}
+              <div 
+                class={`absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-theme-light dark:border-darkmode-theme-light transition-all ${
+                  isCurrent 
+                    ? 'bg-primary ring-4 ring-primary/20 scale-110' 
+                    : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              />
+              
+              <div class="flex flex-col">
+                <span class={`text-[11px] font-bold mb-0.5 ${isCurrent ? 'text-primary' : 'text-text-light dark:text-darkmode-text-light'}`}>
+                  Bagian {post.data.series_part}
                 </span>
-              ) : (
-                <a
-                  href={`/${post_folder}/${post.id}`}
-                  class="text-text hover:text-primary dark:text-darkmode-text dark:hover:text-primary transition-colors font-medium"
-                >
-                  {post.data.title}
-                </a>
-              )}
+
+                {isCurrent ? (
+                  <div class="font-bold text-sm sm:text-base text-text-dark dark:text-darkmode-text-light leading-snug">
+                    <span>{post.data.title}</span>
+                    <span class="ml-2 inline-flex items-center rounded-md bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary align-middle">
+                      Sedang Dibaca
+                    </span>
+                  </div>
+                ) : (
+                  <a
+                    href={`/${post_folder}/${post.id}`}
+                    class="text-sm font-medium text-text hover:text-primary dark:text-darkmode-text dark:hover:text-primary transition-colors leading-snug"
+                  >
+                    {post.data.title}
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
-  </div>
+
+    {/* Footer Quick Nav: Sebelumnya & Selanjutnya */}
+    {(prevPost || nextPost) && (
+      <nav 
+        aria-label="Navigasi Seri Cepat" 
+        class="mt-4 pt-3.5 border-t border-border/70 dark:border-darkmode-border/70 flex flex-wrap items-center justify-between gap-3 text-xs"
+      >
+        {prevPost ? (
+          <a 
+            href={`/${post_folder}/${prevPost.id}`}
+            class="group inline-flex items-center text-text hover:text-primary dark:text-darkmode-text dark:hover:text-primary font-medium transition-colors"
+          >
+            <DynamicIcon icon="FaArrowLeft" className="mr-1.5 text-[11px] transition-transform group-hover:-translate-x-1" />
+            <span class="truncate max-w-[150px] sm:max-w-[200px]">
+              Bagian {prevPost.data.series_part}: Sebelumnya
+            </span>
+          </a>
+        ) : <div />}
+
+        {nextPost ? (
+          <a 
+            href={`/${post_folder}/${nextPost.id}`}
+            class="group inline-flex items-center text-primary font-bold hover:underline transition-all ml-auto"
+          >
+            <span class="truncate max-w-[150px] sm:max-w-[200px]">
+              Bagian {nextPost.data.series_part}: Selanjutnya
+            </span>
+            <DynamicIcon icon="FaArrowRight" className="ml-1.5 text-[11px] transition-transform group-hover:translate-x-1" />
+          </a>
+        ) : <div />}
+      </nav>
+    )}
+  </aside>
 )}
+
+<style>
+  /* Custom Slim Scrollbar */
+  .series-custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  }
+  .series-custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .series-custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .series-custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.4);
+    border-radius: 9999px;
+  }
+  .series-custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.7);
+  }
+</style>
+
+<script>
+  function autoScrollActiveSeries() {
+    const currentItem = document.querySelector('[data-series-current="true"]') as HTMLElement | null;
+    const container = document.getElementById('series-timeline-container');
+    
+    if (currentItem && container) {
+      // Hitung offset agar item aktif berada di posisi yang nyaman di tengah-tengah container
+      const itemOffset = currentItem.offsetTop;
+      const targetScroll = Math.max(0, itemOffset - 60);
+      
+      container.scrollTo({
+        top: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  // Support untuk Astro SPA navigation dan initial load
+  document.addEventListener('astro:page-load', autoScrollActiveSeries);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    autoScrollActiveSeries();
+  } else {
+    document.addEventListener('DOMContentLoaded', autoScrollActiveSeries);
+  }
+</script>
