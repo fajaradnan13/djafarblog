@@ -16,6 +16,7 @@ import { Image } from "astro:assets";
 import { type CollectionEntry, render } from "astro:content";
 import PostSeries from "@/layouts/components/PostSeries.astro";
 import MobileTOC from "@/layouts/components/MobileTOC.astro";
+import ViewCounter from "@/layouts/components/ViewCounter.astro";
 const { post_folder, InnerPaginationOptions } = settings;
 
 type Props = {
@@ -100,6 +101,7 @@ const relatedPosts = similarItems(post, postEntries);
                   {remarkPluginFrontmatter.minutesRead}
                 </li>
               )}
+              <ViewCounter />
             </ul>
             
             <div class="content mb-16">

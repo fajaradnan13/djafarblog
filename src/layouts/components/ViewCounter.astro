@@ -1,0 +1,78 @@
+---
+import DynamicIcon from "@/helpers/DynamicIcon";
+
+interface Props {
+  className?: string;
+}
+
+const { className = "" } = Astro.props;
+---
+
+<li class={`inline-flex items-center font-secondary text-xs leading-3 text-text-light dark:text-darkmode-text-light ${className}`}>
+  <DynamicIcon icon="FaRegEye" className="mr-1.5 text-primary text-[13px]" />
+  <span id="view-count-container" class="inline-flex items-center">
+    <span id="view-count-value" class="font-semibold text-text-dark dark:text-darkmode-text-light">
+      <span class="inline-block w-6 h-3 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></span>
+    </span>
+    <span class="ml-1">kali dibaca</span>
+  </span>
+</li>
+
+<script>
+  function fetchArticleReads() {
+    const valueEl = document.getElementById("view-count-value");
+    if (!valueEl) return;
+
+    // Nama callback unik untuk JSONP
+    const callbackName = "bsz_cb_" + Math.random().toString(36).substring(2, 9);
+
+    let script: HTMLScriptElement | null = document.createElement("script");
+    script.src = `https://busuanzi.ibruce.info/busuanzi?jsonpCallback=${callbackName}`;
+    script.async = true;
+
+    // Timeout 4 detik jika server lambat atau offline
+    const timer = setTimeout(() => {
+      cleanup();
+      // Tampilkan fallback angka minimal saat timeout
+      if (valueEl) valueEl.textContent = "1";
+    }, 4000);
+
+    function cleanup() {
+      clearTimeout(timer);
+      // @ts-ignore
+      delete window[callbackName];
+      if (script && script.parentNode) {
+        script.parentNode.removeChild(script);
+        script = null;
+      }
+    }
+
+    // @ts-ignore
+    window[callbackName] = function (data: any) {
+      if (data && typeof data.page_pv !== "undefined") {
+        const count = Number(data.page_pv);
+        if (valueEl) {
+          valueEl.textContent = count.toLocaleString("id-ID");
+        }
+      } else {
+        if (valueEl) valueEl.textContent = "1";
+      }
+      cleanup();
+    };
+
+    script.onerror = function () {
+      cleanup();
+      if (valueEl) valueEl.textContent = "1";
+    };
+
+    document.head.appendChild(script);
+  }
+
+  // Mendukung navigasi Astro View Transitions dan page load standar
+  document.addEventListener("astro:page-load", fetchArticleReads);
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    fetchArticleReads();
+  } else {
+    document.addEventListener("DOMContentLoaded", fetchArticleReads);
+  }
+</script>
