@@ -17,10 +17,6 @@ series_part: 1
 Selamat datang di seri tutorial **Linux Command Mastery** persembahan channel **Teknologi Newbie**!
 
 Sebelum melangkah mengelola server produksi, menjalankan container, otomasi cloud, atau investigasi cybersecurity, ada satu fondasi paling dasar yang wajib kita kuasai: **memahami perintah-perintah Linux dari Terminal**.
-
-> [!NOTE]
-> Materi artikel ini disusun selaras dengan video YouTube **Linux Command Mastery Episode 1**. Artikel ini dirancang khusus dengan format poin-poin terstruktur agar nyaman dibaca sekaligus siap digunakan dalam **Slide Presentation Mode** saat mengajar.
-
 ---
 
 ## 🎯 1. Apa yang Akan Kita Pelajari Hari Ini?
