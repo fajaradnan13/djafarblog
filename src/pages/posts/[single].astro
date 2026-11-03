@@ -201,6 +201,16 @@ const relatedPosts = similarItems(post, postEntries);
       });
     });
   </script>
-  <SlideView title={title} client:load />
+  <SlideView 
+    title={title} 
+    image={image}
+    description={description}
+    categories={post.data.categories}
+    series={post.data.series}
+    seriesPart={post.data.series_part}
+    date={date ? dateFormat(date) : undefined}
+    readingTime={remarkPluginFrontmatter?.minutesRead}
+    client:load 
+  />
   <MobileTOC headings={headings} />
 </Base>

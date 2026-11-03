@@ -47,9 +47,25 @@ const THEMES = {
 
 interface SlideViewProps {
   title?: string;
+  image?: string;
+  description?: string;
+  categories?: string[];
+  series?: string;
+  seriesPart?: number;
+  date?: string;
+  readingTime?: string;
 }
 
-const SlideView = ({ title }: SlideViewProps) => {
+const SlideView = ({
+  title,
+  image,
+  description,
+  categories,
+  series,
+  seriesPart,
+  date,
+  readingTime
+}: SlideViewProps) => {
   const [isActive, setIsActive] = useState(false);
   const [slides, setSlides] = useState<string[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -68,11 +84,19 @@ const SlideView = ({ title }: SlideViewProps) => {
     if (!contentDiv) return;
 
     const parsedSlides: string[] = [];
+
+    // Slide 1: Cover / Title Slide
+    parsedSlides.push("__TITLE_SLIDE__");
+
     let currentSlideHTML = "";
 
     Array.from(contentDiv.children).forEach((child) => {
       if (child.tagName === "H2" || child.tagName === "H3") {
         if (currentSlideHTML.trim() !== "") {
+          // If the introductory section doesn't have an H2/H3 header, prepend one
+          if (!currentSlideHTML.trim().startsWith("<h2") && !currentSlideHTML.trim().startsWith("<h3")) {
+            currentSlideHTML = `<h2>Pengantar</h2>` + currentSlideHTML;
+          }
           parsedSlides.push(currentSlideHTML);
         }
         currentSlideHTML = child.outerHTML;
@@ -80,7 +104,11 @@ const SlideView = ({ title }: SlideViewProps) => {
         currentSlideHTML += child.outerHTML;
       }
     });
+
     if (currentSlideHTML.trim() !== "") {
+      if (!currentSlideHTML.trim().startsWith("<h2") && !currentSlideHTML.trim().startsWith("<h3")) {
+        currentSlideHTML = `<h2>Pengantar</h2>` + currentSlideHTML;
+      }
       parsedSlides.push(currentSlideHTML);
     }
 
@@ -251,9 +279,10 @@ const SlideView = ({ title }: SlideViewProps) => {
       
       if (e.key === "Escape") {
         closeSlideView();
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === "ArrowRight" || e.key === " " || e.code === "Space" || e.key === "PageDown") {
+        if (e.key === " " || e.code === "Space") e.preventDefault();
         setCurrentSlideIndex((prev) => Math.min(prev + 1, slides.length - 1));
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
         setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -312,26 +341,132 @@ const SlideView = ({ title }: SlideViewProps) => {
             ref={scrollContainerRef}
             className="absolute inset-0 z-20 flex flex-col items-center justify-start p-8 pt-16 md:p-12 md:pt-16 overflow-y-auto pointer-events-none pb-32"
           >
-            {/* Brand Identity - scrolls with content */}
-            <div className="w-full max-w-5xl flex items-center space-x-3 opacity-60 mb-8 pointer-events-auto">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm border ${currentStyle.brandCircle}`}>
-                <DynamicIcon icon="FaGraduationCap" className={`text-xl ${currentStyle.text}`} />
-              </div>
-              <div>
-                <div className={`font-primary font-bold tracking-wider text-sm uppercase ${currentStyle.text}`}>
-                  Teknologi Newbie
+            {/* Brand Identity - scrolls with content (hidden on title slide for cleaner cover) */}
+            {slides[currentSlideIndex] !== "__TITLE_SLIDE__" && (
+              <div className="w-full max-w-5xl flex items-center space-x-3 opacity-60 mb-8 pointer-events-auto">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm border ${currentStyle.brandCircle}`}>
+                  <DynamicIcon icon="FaGraduationCap" className={`text-xl ${currentStyle.text}`} />
                 </div>
-                <div className="text-xs opacity-60 font-secondary tracking-widest truncate max-w-[200px] sm:max-w-sm md:max-w-md">
-                  {title || "Slide Presentation"}
+                <div>
+                  <div className={`font-primary font-bold tracking-wider text-sm uppercase ${currentStyle.text}`}>
+                    Teknologi Newbie
+                  </div>
+                  <div className="text-xs opacity-60 font-secondary tracking-widest truncate max-w-[200px] sm:max-w-sm md:max-w-md">
+                    {title || "Slide Presentation"}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div 
-              className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300 pointer-events-none`}
-              style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
-              dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
-            />
+            {/* Slide 1: Premium Title / Cover Slide */}
+            {slides[currentSlideIndex] === "__TITLE_SLIDE__" ? (
+              <div 
+                className="max-w-5xl w-full flex flex-col items-center justify-center my-auto py-2 transition-all duration-300 pointer-events-none"
+                style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
+              >
+                <div className="w-full">
+                  {/* Hero Cover Card */}
+                  {image && (
+                    <div className={`relative w-full max-h-[50vh] rounded-2xl overflow-hidden shadow-2xl mb-6 bg-slate-900/60 backdrop-blur border ${
+                      theme === 'midnight' 
+                        ? 'border-sky-500/30 shadow-[0_10px_35px_-5px_rgba(56,189,248,0.25)]' 
+                        : theme === 'light' 
+                          ? 'border-slate-200 shadow-xl' 
+                          : 'border-emerald-500/30 shadow-[0_10px_35px_-5px_rgba(16,185,129,0.25)]'
+                    }`}>
+                      <img 
+                        src={image} 
+                        alt={title || "Cover Slide"} 
+                        className="w-full h-auto max-h-[48vh] object-cover object-center"
+                      />
+                      {/* Subtle Vignette Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+
+                      {/* Category Pills on Top-Left of Image */}
+                      {categories && categories.length > 0 && (
+                        <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10 pointer-events-auto">
+                          {categories.map((cat, idx) => (
+                            <span 
+                              key={idx} 
+                              className="px-3.5 py-1 text-xs sm:text-sm font-semibold rounded-full bg-emerald-600/90 text-white shadow-md backdrop-blur border border-emerald-400/30 flex items-center tracking-wide"
+                            >
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Series Badge on Bottom-Left */}
+                      {series && (
+                        <div className="absolute bottom-4 left-4 z-10 flex items-center space-x-2">
+                          <span className="px-3.5 py-1.5 text-xs font-mono font-bold uppercase rounded-lg bg-black/80 text-emerald-400 border border-emerald-500/40 backdrop-blur tracking-wider shadow-lg">
+                            {series} {seriesPart ? `• Part ${seriesPart}` : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Fallback Categories if no image */}
+                  {!image && categories && categories.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {categories.map((cat, idx) => (
+                        <span key={idx} className="px-3.5 py-1 text-xs font-semibold rounded-full bg-primary/20 text-primary border border-primary/30">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Main Title */}
+                  <h1 className={`text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-tight mb-4 ${
+                    theme === 'light' 
+                      ? 'text-slate-900' 
+                      : theme === 'midnight' 
+                        ? 'bg-gradient-to-r from-sky-200 via-white to-blue-200 bg-clip-text text-transparent' 
+                        : 'bg-gradient-to-r from-emerald-300 via-white to-green-200 bg-clip-text text-transparent'
+                  }`}>
+                    {title}
+                  </h1>
+
+                  {/* Meta Description */}
+                  {description && (
+                    <p className="text-sm sm:text-base md:text-lg opacity-80 max-w-4xl font-secondary leading-relaxed mb-6">
+                      {description}
+                    </p>
+                  )}
+
+                  {/* Footer Meta Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-current/15 text-xs sm:text-sm opacity-80 pointer-events-auto">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${currentStyle.brandCircle}`}>
+                        TN
+                      </div>
+                      <span className="font-bold tracking-wider uppercase">Teknologi Newbie</span>
+                      {readingTime && <span>• {readingTime}</span>}
+                      {date && <span>• {date}</span>}
+                    </div>
+
+                    <button 
+                      onClick={() => setCurrentSlideIndex(1)}
+                      className={`flex items-center space-x-2 font-mono text-xs font-bold tracking-wide transition-all hover:scale-105 active:scale-95 ${
+                        theme === 'midnight' ? 'text-sky-400' : 'text-emerald-400'
+                      }`}
+                      title="Mulai Slide Berikutnya"
+                    >
+                      <span className="animate-pulse">Mulai Presentasi: Tekan [→] atau [Spasi]</span>
+                      <DynamicIcon icon="FaChevronRight" className="text-xs" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div 
+                className={`prose ${currentStyle.prose} prose-lg md:prose-2xl max-w-5xl w-full slide-content-wrapper transition-colors duration-300 pointer-events-none`}
+                style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}
+                dangerouslySetInnerHTML={{ __html: slides[currentSlideIndex] }}
+              />
+            )}
           </div>
 
           {/* Theme Selector (Bottom Left) */}
